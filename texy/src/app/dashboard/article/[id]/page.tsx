@@ -2,11 +2,13 @@
 
 import React, { useState, useRef } from 'react';
 import { Bookmark, ExternalLink, Share2 } from 'lucide-react';
-import SidebarComponent from '../components/Sidebar';
-import GeoImpactWidget from '../components/GeoImpactWidget';
-import KeywordsWidget from '../components/KeywordsWidget';
-import IntelligenceSidebar from '../components/IntelligenceSidebar';
-import NoteInput from '../components/NoteInput';
+import SidebarComponent from '../../components/Sidebar';
+import GeoImpactWidget from '../../components/GeoImpactWidget';
+import KeywordsWidget from '../../components/KeywordsWidget';
+import IntelligenceSidebar from '../../components/IntelligenceSidebar';
+import NoteInput from '../../components/NoteInput';
+import { useFilteredArticles } from '@/hooks/useArticles';
+import { usePathname } from 'next/navigation';
 
 interface Highlight {
     id: string;
@@ -50,6 +52,14 @@ const ARTICLE_CONTENT = {
 };
 
 const ArticleDetail = () => {
+
+    const pathname = usePathname();
+    const { articles } = useFilteredArticles();
+    const articleId = pathname.split('/').pop();
+    const article = articles.find((article) => article.id === articleId);
+
+    console.log(pathname, article);
+
     const [isSaved, setIsSaved] = useState(false);
     const [highlights, setHighlights] = useState<Highlight[]>([]);
     const [selection, setSelection] = useState<SelectionState | null>(null);
@@ -160,11 +170,7 @@ const ArticleDetail = () => {
     };
 
     return (
-        <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-violet-100 selection:text-violet-900 lg:grid lg:grid-cols-[260px_1fr]">
-            <div className="hidden lg:block">
-                <SidebarComponent isMobileMenuOpen={isMobileMenuOpen} setIsMobileMenuOpen={setIsMobileMenuOpen} />
-            </div>
-
+        <div>
             <div className="flex h-screen overflow-hidden">
                 <div className="flex-1 overflow-y-auto" onMouseUp={handleMouseUp}>
                     <div className="border-b border-gray-200 bg-white sticky top-0 z-20 px-8 lg:px-12 py-4">
