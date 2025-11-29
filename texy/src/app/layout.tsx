@@ -9,8 +9,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Newscraper - News Aggregator",
-  description: "Modern news aggregation platform",
+  title: "Texy - News Aggregator",
+  description: "Modern news aggregation platform with AI",
 };
 
 export default function RootLayout({
