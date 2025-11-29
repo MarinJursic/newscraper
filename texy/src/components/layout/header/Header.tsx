@@ -1,7 +1,7 @@
 "use client"
 
 import { useSidebar, SidebarTrigger } from "@/components/ui/sidebar"
-import { useRightSidebar } from "@/components/layout/right-sidebar/RightSidebarContext"
+import { useRightSidebar } from "@/hooks/use-right-sidebar"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { useState, useRef, useEffect } from "react"
