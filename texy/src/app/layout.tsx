@@ -1,3 +1,4 @@
+// app/layout.tsx
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
@@ -10,8 +11,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Newscraper - News Aggregator",
-  description: "Modern news aggregation platform",
+  title: "Blinkfeed - News Aggregator",
+  description: "Modern news aggregation platform with AI",
 };
 
 export default function RootLayout({

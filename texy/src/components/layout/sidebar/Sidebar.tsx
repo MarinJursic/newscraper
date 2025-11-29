@@ -11,6 +11,7 @@ import {
 import { Header } from "./components/SidebarHeader"
 import { SidebarMenuList } from "./components/MenuList"
 import { SidebarNotification } from "./components/Updates"
+import { UserControls } from "./components/UserControls"
 
 export function AppSidebar() {
     return (
@@ -23,6 +24,7 @@ export function AppSidebar() {
 
             <SidebarFooter>
                 <SidebarNotification />
+                <UserControls />
             </SidebarFooter>
         </Sidebar>
     )
