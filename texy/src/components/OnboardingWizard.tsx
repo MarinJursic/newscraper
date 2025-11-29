@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowRight, Check, Code, Briefcase, Coffee, Zap, Brain, Github, Loader2, Server, Shield, Smartphone, Terminal, TrendingUp, Users, BookOpen, Headphones, Mail, ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { subscribeUser } from '@/lib/api';
+import { useAuthStore } from '@/store/authStore';
 
 type Step = 'auth' | 'profession' | 'stack' | 'attention' | 'calibration';
 type AuthMode = 'signup' | 'login';
@@ -28,15 +30,17 @@ const GoogleLogo = () => (
 
 const OnboardingWizard = () => {
     const router = useRouter();
+    const login = useAuthStore((state) => state.login);
     const [currentStep, setCurrentStep] = useState<Step>('auth');
     const [authMode, setAuthMode] = useState<AuthMode>('signup');
     const [formData, setFormData] = useState({
         email: '',
-        password: '',
         role: '',
         stack: [] as string[],
         attentionSpan: '',
     });
+    const [error, setError] = useState<string | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const stepOrder: Step[] = ['auth', 'profession', 'stack', 'attention', 'calibration'];
 
@@ -60,19 +64,128 @@ const OnboardingWizard = () => {
         }));
     };
 
-    // Calibration Animation
+    // Calibration Animation and API call
     const [calibrationText, setCalibrationText] = useState('Building your profile...');
 
     useEffect(() => {
         if (currentStep === 'calibration') {
-            const timers = [
-                setTimeout(() => setCalibrationText('Analyzing 1,400 sources...'), 1500),
-                setTimeout(() => setCalibrationText('Personalizing Dashboard...'), 3000),
-                setTimeout(() => router.push('/'), 4500) // Redirect to dashboard (home for now)
-            ];
-            return () => timers.forEach(clearTimeout);
+            const submitData = async () => {
+                try {
+                    setCalibrationText('Saving your preferences...');
+
+                    // Map frontend roles to backend format
+                    const roleMap: Record<string, string> = {
+                        'frontend': 'frontend',
+                        'backend': 'backend',
+                        'devops': 'devops',
+                        'mobile': 'mobile',
+                        'cto': 'cto/vp',
+                        'pm': 'product mgr',
+                        'founder': 'founder',
+                        'security': 'security',
+                        'ai': 'data/ai'
+                    };
+
+                    const backendRole = roleMap[formData.role] || formData.role;
+
+                    // Map tech stack to backend format (must match backend validation)
+                    const techStackMap: Record<string, string> = {
+                        'Python': 'python',
+                        'React': 'react',
+                        'AWS': 'aws',
+                        'Docker': 'docker',
+                        'CyberSec': 'cybersec',
+                        'Crypto': 'crypto',
+                        'AI': 'ai',
+                        'Rust': 'rust',
+                        'Go': 'go',
+                        'Kubernetes': 'kubernetes',
+                        'Design': 'design',
+                        'GraphQL': 'graphql',
+                        'Node.js': 'node.js',  // Keep the dot!
+                        'Next.js': 'next.js'   // Keep the dot!
+                    };
+
+                    const techStack = formData.stack.map(tech => techStackMap[tech] || tech.toLowerCase());
+
+                    console.log('Subscribing user:', { email: formData.email, role: backendRole, tech_stack: techStack });
+
+                    // Subscribe user to backend
+                    await subscribeUser({
+                        email: formData.email,
+                        role: backendRole,
+                        tech_stack: techStack
+                    });
+
+                    // Save to auth store
+                    login({
+                        email: formData.email,
+                        role: formData.role,
+                        tech_stack: formData.stack
+                    });
+
+                    setCalibrationText('Analyzing 1,400 sources...');
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+
+                    setCalibrationText('Personalizing Dashboard...');
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+
+                    // Redirect to dashboard
+                    router.push('/dashboard');
+                } catch (err: any) {
+                    console.error('Subscription error:', err);
+                    let errorMessage = 'Failed to complete setup. Please try again.';
+
+                    // Handle different error response formats
+                    if (err?.response?.data?.detail) {
+                        const detail = err.response.data.detail;
+
+                        // If detail is an array (FastAPI validation errors)
+                        if (Array.isArray(detail)) {
+                            const messages = detail
+                                .map((e: any) => {
+                                    // Extract just the message, not technical details
+                                    if (typeof e === 'string') return e;
+                                    if (e.msg) return e.msg;
+                                    if (e.message) return e.message;
+                                    return null;
+                                })
+                                .filter(Boolean);
+                            errorMessage = messages.length > 0 ? messages.join('. ') : errorMessage;
+                        }
+                        // If detail is an object
+                        else if (typeof detail === 'object') {
+                            errorMessage = detail.msg || detail.message || errorMessage;
+                        }
+                        // If detail is a string
+                        else {
+                            errorMessage = String(detail);
+                        }
+                    } else if (err?.message && !err.message.includes('status code')) {
+                        // Only use err.message if it's not a generic axios error
+                        errorMessage = err.message;
+                    }
+
+                    // Clean up common technical jargon
+                    errorMessage = errorMessage
+                        .replace(/status code \d+/gi, '')
+                        .replace(/request failed with/gi, '')
+                        .replace(/^[:\s]+|[:\s]+$/g, '')
+                        .trim();
+
+                    // If the error message is empty after cleanup, use default
+                    if (!errorMessage) {
+                        errorMessage = 'Failed to complete setup. Please try again.';
+                    }
+
+                    setError(errorMessage);
+                    setCurrentStep('auth');
+                }
+            };
+
+            submitData();
         }
-    }, [currentStep, router]);
+    }, [currentStep, router, formData, login]);
 
     // Dynamic Preview Content
     const getPreviewContent = () => {
@@ -269,77 +382,51 @@ const OnboardingWizard = () => {
                         </div>
                     )}
 
-                    {/* Step 1: Auth (Login / Signup) */}
+                    {/* Step 1: Auth (Email Only) */}
                     {currentStep === 'auth' && (
                         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                             <div className="mb-8">
                                 <h1 className="text-3xl font-bold mb-2">Welcome to Blinkfeed.</h1>
-                                <p className="text-slate-500">Your personalized intelligence hub awaits.</p>
+                                <p className="text-slate-500">Enter your email to get started - no password required.</p>
                             </div>
 
-                            {/* Auth Tabs */}
-                            <div className="flex p-1 bg-gray-100 rounded-lg mb-8">
-                                <button
-                                    onClick={() => setAuthMode('signup')}
-                                    className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${authMode === 'signup' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'
-                                        }`}
-                                >
-                                    Create Account
-                                </button>
-                                <button
-                                    onClick={() => setAuthMode('login')}
-                                    className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${authMode === 'login' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'
-                                        }`}
-                                >
-                                    Sign In
-                                </button>
-                            </div>
-
-                            <div className="space-y-3 mb-6">
-                                <button className="w-full flex items-center justify-center gap-3 bg-white border border-gray-200 text-slate-700 p-3 rounded-lg font-medium hover:bg-gray-50 transition-colors">
-                                    <GoogleLogo />
-                                    {authMode === 'signup' ? 'Sign up with Google' : 'Sign in with Google'}
-                                </button>
-                                <button className="w-full flex items-center justify-center gap-3 bg-[#24292F] text-white p-3 rounded-lg font-medium hover:bg-[#24292F]/90 transition-colors">
-                                    <Github className="w-5 h-5" />
-                                    {authMode === 'signup' ? 'Sign up with GitHub' : 'Sign in with GitHub'}
-                                </button>
-                            </div>
-
-                            <div className="relative mb-6">
-                                <div className="absolute inset-0 flex items-center">
-                                    <div className="w-full border-t border-gray-200"></div>
+                            {error && (
+                                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+                                    {error}
                                 </div>
-                                <div className="relative flex justify-center text-sm">
-                                    <span className="px-2 bg-white text-slate-400">Or continue with email</span>
-                                </div>
-                            </div>
+                            )}
 
-                            <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); handleNext('profession'); }}>
+                            <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); if(formData.email) handleNext('profession'); }}>
                                 <div>
                                     <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
                                     <input
                                         type="email"
+                                        required
                                         className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-transparent outline-none transition-all"
                                         placeholder="you@company.com"
                                         value={formData.email}
-                                        onChange={e => setFormData({ ...formData, email: e.target.value })}
+                                        onChange={e => {
+                                            setFormData({ ...formData, email: e.target.value });
+                                            setError(null);
+                                        }}
                                     />
+                                    <p className="text-xs text-slate-400 mt-2">We'll send you personalized tech news daily</p>
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">Password</label>
-                                    <input
-                                        type="password"
-                                        className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-transparent outline-none transition-all"
-                                        placeholder="••••••••"
-                                        value={formData.password}
-                                        onChange={e => setFormData({ ...formData, password: e.target.value })}
-                                    />
-                                </div>
-                                <button type="submit" className="w-full bg-violet-600 text-white p-3 rounded-lg font-medium hover:bg-violet-700 transition-colors mt-4 flex items-center justify-center gap-2">
-                                    {authMode === 'signup' ? 'Get Started' : 'Sign In'} <ArrowRight className="w-4 h-4" />
+                                <button
+                                    type="submit"
+                                    disabled={!formData.email}
+                                    className={`w-full p-3 rounded-lg font-medium transition-colors mt-4 flex items-center justify-center gap-2 ${formData.email
+                                        ? 'bg-violet-600 text-white hover:bg-violet-700'
+                                        : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                    }`}
+                                >
+                                    Get Started <ArrowRight className="w-4 h-4" />
                                 </button>
                             </form>
+
+                            <div className="mt-6 text-center text-xs text-slate-400">
+                                By continuing, you agree to receive our daily newsletter
+                            </div>
                         </div>
                     )}
 

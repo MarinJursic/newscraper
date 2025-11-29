@@ -20,5 +20,9 @@ pytrends==4.9.2
 # AI Summarization (OpenAI)
 openai==1.55.3
 
+# Stock Market Data
+yfinance==0.2.49
+
 # Data Processing
 python-dateutil==2.9.0
+pandas>=2.0.0
