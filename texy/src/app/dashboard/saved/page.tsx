@@ -11,7 +11,7 @@ import {
   Clock,
   BookmarkIcon,
 } from "lucide-react";
-import Sidebar from "../components/Sidebar";
+import Sidebar from "../components/Sidebar2";
 import LibraryStats from "../components/LibraryStats";
 import SavedArticleCard from "../components/SavedArticleCard";
 import EmptyState from "../components/EmptyState";
