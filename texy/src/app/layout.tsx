@@ -10,7 +10,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Texy - News Aggregator",
+  title: "Blinkfeed - News Aggregator",
   description: "Modern news aggregation platform with AI",
 };
 

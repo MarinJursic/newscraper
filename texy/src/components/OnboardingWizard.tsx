@@ -273,7 +273,7 @@ const OnboardingWizard = () => {
                     {currentStep === 'auth' && (
                         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                             <div className="mb-8">
-                                <h1 className="text-3xl font-bold mb-2">Welcome to Texy.</h1>
+                                <h1 className="text-3xl font-bold mb-2">Welcome to Blinkfeed.</h1>
                                 <p className="text-slate-500">Your personalized intelligence hub awaits.</p>
                             </div>
 
@@ -364,8 +364,8 @@ const OnboardingWizard = () => {
                                                 key={role.id}
                                                 onClick={() => setFormData({ ...formData, role: role.id })}
                                                 className={`p-4 border rounded-xl text-left transition-all flex flex-col gap-2 ${formData.role === role.id
-                                                        ? 'bg-violet-50 border-violet-500 ring-1 ring-violet-500'
-                                                        : 'bg-white border-gray-200 hover:border-violet-300 hover:bg-gray-50'
+                                                    ? 'bg-violet-50 border-violet-500 ring-1 ring-violet-500'
+                                                    : 'bg-white border-gray-200 hover:border-violet-300 hover:bg-gray-50'
                                                     }`}
                                             >
                                                 <role.icon className={`w-5 h-5 ${formData.role === role.id ? 'text-violet-600' : 'text-slate-400'}`} />
@@ -388,8 +388,8 @@ const OnboardingWizard = () => {
                                                 key={role.id}
                                                 onClick={() => setFormData({ ...formData, role: role.id })}
                                                 className={`p-4 border rounded-xl text-left transition-all flex flex-col gap-2 ${formData.role === role.id
-                                                        ? 'bg-violet-50 border-violet-500 ring-1 ring-violet-500'
-                                                        : 'bg-white border-gray-200 hover:border-violet-300 hover:bg-gray-50'
+                                                    ? 'bg-violet-50 border-violet-500 ring-1 ring-violet-500'
+                                                    : 'bg-white border-gray-200 hover:border-violet-300 hover:bg-gray-50'
                                                     }`}
                                             >
                                                 <role.icon className={`w-5 h-5 ${formData.role === role.id ? 'text-violet-600' : 'text-slate-400'}`} />
@@ -411,8 +411,8 @@ const OnboardingWizard = () => {
                                                 key={role.id}
                                                 onClick={() => setFormData({ ...formData, role: role.id })}
                                                 className={`p-4 border rounded-xl text-left transition-all flex flex-col gap-2 ${formData.role === role.id
-                                                        ? 'bg-violet-50 border-violet-500 ring-1 ring-violet-500'
-                                                        : 'bg-white border-gray-200 hover:border-violet-300 hover:bg-gray-50'
+                                                    ? 'bg-violet-50 border-violet-500 ring-1 ring-violet-500'
+                                                    : 'bg-white border-gray-200 hover:border-violet-300 hover:bg-gray-50'
                                                     }`}
                                             >
                                                 <role.icon className={`w-5 h-5 ${formData.role === role.id ? 'text-violet-600' : 'text-slate-400'}`} />
@@ -427,8 +427,8 @@ const OnboardingWizard = () => {
                                 onClick={() => handleNext('stack')}
                                 disabled={!formData.role}
                                 className={`w-full p-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 mt-8 ${formData.role
-                                        ? 'bg-violet-600 text-white hover:bg-violet-700'
-                                        : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                    ? 'bg-violet-600 text-white hover:bg-violet-700'
+                                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                                     }`}
                             >
                                 Continue <ArrowRight className="w-4 h-4" />
@@ -448,8 +448,8 @@ const OnboardingWizard = () => {
                                         key={tech}
                                         onClick={() => toggleStack(tech)}
                                         className={`px-4 py-2 rounded-full border transition-all flex items-center gap-2 ${formData.stack.includes(tech)
-                                                ? 'bg-violet-600 border-violet-600 text-white shadow-md shadow-violet-200'
-                                                : 'bg-white border-gray-200 text-slate-600 hover:border-violet-300'
+                                            ? 'bg-violet-600 border-violet-600 text-white shadow-md shadow-violet-200'
+                                            : 'bg-white border-gray-200 text-slate-600 hover:border-violet-300'
                                             }`}
                                     >
                                         {tech}
@@ -462,8 +462,8 @@ const OnboardingWizard = () => {
                                 onClick={() => handleNext('attention')}
                                 disabled={formData.stack.length < 3}
                                 className={`w-full p-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 ${formData.stack.length >= 3
-                                        ? 'bg-violet-600 text-white hover:bg-violet-700'
-                                        : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                    ? 'bg-violet-600 text-white hover:bg-violet-700'
+                                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                                     }`}
                             >
                                 Continue <ArrowRight className="w-4 h-4" />
@@ -481,8 +481,8 @@ const OnboardingWizard = () => {
                                 <button
                                     onClick={() => setFormData({ ...formData, attentionSpan: 'sprinter' })}
                                     className={`w-full p-5 text-left border rounded-xl transition-all flex items-start gap-4 ${formData.attentionSpan === 'sprinter'
-                                            ? 'bg-violet-50 border-violet-500 ring-1 ring-violet-500'
-                                            : 'bg-white border-gray-200 hover:border-violet-300 hover:bg-gray-50'
+                                        ? 'bg-violet-50 border-violet-500 ring-1 ring-violet-500'
+                                        : 'bg-white border-gray-200 hover:border-violet-300 hover:bg-gray-50'
                                         }`}
                                 >
                                     <div className={`p-3 rounded-lg ${formData.attentionSpan === 'sprinter' ? 'bg-violet-200 text-violet-700' : 'bg-amber-100 text-amber-600'}`}>
@@ -497,8 +497,8 @@ const OnboardingWizard = () => {
                                 <button
                                     onClick={() => setFormData({ ...formData, attentionSpan: 'commuter' })}
                                     className={`w-full p-5 text-left border rounded-xl transition-all flex items-start gap-4 ${formData.attentionSpan === 'commuter'
-                                            ? 'bg-violet-50 border-violet-500 ring-1 ring-violet-500'
-                                            : 'bg-white border-gray-200 hover:border-violet-300 hover:bg-gray-50'
+                                        ? 'bg-violet-50 border-violet-500 ring-1 ring-violet-500'
+                                        : 'bg-white border-gray-200 hover:border-violet-300 hover:bg-gray-50'
                                         }`}
                                 >
                                     <div className={`p-3 rounded-lg ${formData.attentionSpan === 'commuter' ? 'bg-violet-200 text-violet-700' : 'bg-blue-100 text-blue-600'}`}>
@@ -513,8 +513,8 @@ const OnboardingWizard = () => {
                                 <button
                                     onClick={() => setFormData({ ...formData, attentionSpan: 'deep' })}
                                     className={`w-full p-5 text-left border rounded-xl transition-all flex items-start gap-4 ${formData.attentionSpan === 'deep'
-                                            ? 'bg-violet-50 border-violet-500 ring-1 ring-violet-500'
-                                            : 'bg-white border-gray-200 hover:border-violet-300 hover:bg-gray-50'
+                                        ? 'bg-violet-50 border-violet-500 ring-1 ring-violet-500'
+                                        : 'bg-white border-gray-200 hover:border-violet-300 hover:bg-gray-50'
                                         }`}
                                 >
                                     <div className={`p-3 rounded-lg ${formData.attentionSpan === 'deep' ? 'bg-violet-200 text-violet-700' : 'bg-emerald-100 text-emerald-600'}`}>
@@ -531,8 +531,8 @@ const OnboardingWizard = () => {
                                 onClick={() => handleNext('calibration')}
                                 disabled={!formData.attentionSpan}
                                 className={`w-full p-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 mt-8 ${formData.attentionSpan
-                                        ? 'bg-violet-600 text-white hover:bg-violet-700'
-                                        : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                    ? 'bg-violet-600 text-white hover:bg-violet-700'
+                                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                                     }`}
                             >
                                 Finish Setup <ArrowRight className="w-4 h-4" />

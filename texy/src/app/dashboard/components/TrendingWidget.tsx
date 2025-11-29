@@ -1,11 +1,14 @@
-import React from 'react';
+"use client"
+
 import { Activity } from 'lucide-react';
 
-interface TrendingWidgetProps {
-    keywords: Array<{ tag: string; count: number }>;
+type Keyword = {
+    tag: string;
+    count: number;
 }
 
-const TrendingWidget: React.FC<TrendingWidgetProps> = ({ keywords }) => {
+const TrendingWidget = ({ keywords, totalArticles }: { keywords: Keyword[], totalArticles: number }) => {
+
     return (
         <div className="bg-white rounded-2xl border border-gray-200 p-6 sticky top-24">
             <div className="flex items-center justify-between mb-6">
@@ -33,7 +36,7 @@ const TrendingWidget: React.FC<TrendingWidgetProps> = ({ keywords }) => {
                         <span className="text-[10px] font-bold text-slate-700 uppercase tracking-wider">System Status</span>
                     </div>
                     <p className="text-[10px] text-slate-500 leading-relaxed">
-                        1,240 articles scanned today. AI analysis engine is online.
+                        {totalArticles} articles scanned today. AI analysis engine is online.
                     </p>
                 </div>
             </div>

@@ -28,9 +28,9 @@ const IntelligenceSidebar: React.FC<IntelligenceSidebarProps> = ({
             <div className="flex border-b border-gray-200 flex-shrink-0">
                 <button
                     onClick={() => setActiveTab('notes')}
-                    className={`flex-1 py-3 text-sm font-medium flex items-center justify-center gap-2 border-b-2 transition-colors ${activeTab === 'notes'
-                            ? 'border-violet-600 text-violet-600'
-                            : 'border-transparent text-slate-500 hover:text-slate-700'
+                    className={`cursor-pointer flex-1 py-3 text-sm font-medium flex items-center justify-center gap-2 border-b-2 transition-colors ${activeTab === 'notes'
+                        ? 'border-violet-600 text-violet-600'
+                        : 'border-transparent text-slate-500 hover:text-slate-700'
                         }`}
                 >
                     <FileText className="w-4 h-4" />
@@ -43,9 +43,9 @@ const IntelligenceSidebar: React.FC<IntelligenceSidebarProps> = ({
                 </button>
                 <button
                     onClick={() => setActiveTab('chat')}
-                    className={`flex-1 py-3 text-sm font-medium flex items-center justify-center gap-2 border-b-2 transition-colors ${activeTab === 'chat'
-                            ? 'border-violet-600 text-violet-600'
-                            : 'border-transparent text-slate-500 hover:text-slate-700'
+                    className={`cursor-pointer flex-1 py-3 text-sm font-medium flex items-center justify-center gap-2 border-b-2 transition-colors ${activeTab === 'chat'
+                        ? 'border-violet-600 text-violet-600'
+                        : 'border-transparent text-slate-500 hover:text-slate-700'
                         }`}
                 >
                     <Bot className="w-4 h-4" />
