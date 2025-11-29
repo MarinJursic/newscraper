@@ -41,9 +41,9 @@ const WorldMap: React.FC<WorldMapProps> = ({ height }) => {
 
     // Severity color mapping
     const severityColors = {
-      1: am5.color("#10B981"), // Green for low severity
-      2: am5.color("#F59E0B"), // Yellow for medium severity
-      3: am5.color("#F97316"), // Orange for high severity
+      1: am5.color("#e2d300"), // Yellow for low severity
+      2: am5.color("#F59E0B"), // Orange for medium severity
+      3: am5.color("#c70000"), // Red for high severity
     };
 
     // Mock severity data for countries
