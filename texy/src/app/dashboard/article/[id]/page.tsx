@@ -136,6 +136,9 @@ const ArticleDetail = () => {
     const [selection, setSelection] = useState<SelectionState | null>(null);
     const [activeTab, setActiveTab] = useState<'chat' | 'notes'>('notes');
     const [editingNote, setEditingNote] = useState('');
+    const [feedbackGiven, setFeedbackGiven] = useState<'positive' | 'negative' | null>(null);
+    const [showFeedbackInput, setShowFeedbackInput] = useState(false);
+    const [feedbackText, setFeedbackText] = useState('');
 
     const contentRef = useRef<HTMLDivElement>(null);
     const noteInputRef = useRef<HTMLInputElement>(null);

@@ -2,16 +2,26 @@ import React from 'react';
 import { DisplayArticle } from '@/types/articles';
 import { useRouter } from 'next/navigation';
 import { ChevronRight } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
-const ArticleCard = ({ article, idx }: { article: DisplayArticle; idx: number }) => {
+interface ArticleCardProps {
+    article: DisplayArticle;
+    idx: number;
+    animate?: boolean;
+}
+
+const ArticleCard = ({ article, idx, animate = true }: ArticleCardProps) => {
     const router = useRouter();
 
     return (
         <div
             key={article.id}
             onClick={() => router.push(`/dashboard/article/${article.id}`)}
-            className="cursor-pointer group bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md transition-all duration-300 hover:border-violet-200 flex flex-col h-full animate-in fade-in slide-in-from-bottom-4"
-            style={{ animationDelay: `${idx * 50}ms` }}
+            className={cn(
+                "cursor-pointer group bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md transition-all duration-300 hover:border-violet-200 flex flex-col h-full",
+                animate && "animate-in fade-in slide-in-from-bottom-4"
+            )}
+            style={animate ? { animationDelay: `${idx * 50}ms` } : undefined}
         >
             <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
