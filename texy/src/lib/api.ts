@@ -70,14 +70,14 @@ export interface ArticleStats {
 export interface UserPreferences {
   email: string;
   role: string;
-  tech_stack: string[];
+  categories: string[];
 }
 
 export interface SubscribeResponse {
   message: string;
   email: string;
   role: string;
-  tech_stack: string[];
+  categories: string[];
 }
 
 // API Functions
@@ -89,7 +89,7 @@ export async function subscribeUser(data: UserPreferences): Promise<SubscribeRes
   const params = new URLSearchParams();
   params.append('email', data.email);
   params.append('role', data.role);
-  data.tech_stack.forEach(tech => params.append('tech_stack', tech));
+  data.categories.forEach(category => params.append('categories', category));
 
   const response = await apiClient.post<SubscribeResponse>('/subscribe', params, {
     headers: {

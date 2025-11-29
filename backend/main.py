@@ -529,7 +529,7 @@ def subscribe_to_newsletter(
     background_tasks: BackgroundTasks,
     email: str = Form(...),
     role: str = Form(...),
-    tech_stack: list[str] = Form(...)
+    categories: list[str] = Form(default=[])
 ):
     """
     Subscribe to daily newsletter.
@@ -537,22 +537,26 @@ def subscribe_to_newsletter(
     Args:
         email: Subscriber email
         role: One of: frontend, backend, devops, mobile, cto/vp, product mgr, founder, security, data/ai
-        tech_stack: List of technologies: python, react, aws, docker, cybersec, crypto, ai, rust, go, kubernetes, design, graphql, node.js, next.js
+        categories: List of categories: malware, vulnerability, data_breach, ransomware, phishing, apt, privacy, cloud, mobile, iot, crypto, ai, regulation, enterprise, authentication
     """
     import json
     from datetime import datetime
     from email_service import send_welcome_newsletter
+    from config import LEGACY_CATEGORIES
     
     # Validate role
     valid_roles = ["frontend", "backend", "devops", "mobile", "cto/vp", "product mgr", "founder", "security", "data/ai"]
     if role.lower() not in valid_roles:
         raise HTTPException(status_code=400, detail=f"Invalid role. Must be one of: {', '.join(valid_roles)}")
     
-    # Validate tech stack
-    valid_tech = ["python", "react", "aws", "docker", "cybersec", "crypto", "ai", "rust", "go", "kubernetes", "design", "graphql", "node.js", "next.js"]
-    invalid_tech = [t for t in tech_stack if t.lower() not in valid_tech]
-    if invalid_tech:
-        raise HTTPException(status_code=400, detail=f"Invalid tech stack items: {', '.join(invalid_tech)}")
+    # Validate categories
+    valid_categories = list(LEGACY_CATEGORIES.keys())
+    invalid_categories = [c for c in categories if c.lower() not in valid_categories]
+    if invalid_categories:
+        raise HTTPException(status_code=400, detail=f"Invalid categories: {', '.join(invalid_categories)}. Valid categories: {', '.join(valid_categories)}")
+    
+    # Normalize categories to lowercase
+    normalized_categories = [c.lower() for c in categories]
     
     conn = get_db_connection()
     c = conn.cursor()
@@ -563,32 +567,34 @@ def subscribe_to_newsletter(
 
     if existing:
         # Update existing subscription (whether active or not)
+        # Store categories in tech_stack column for backward compatibility
         c.execute("""
             UPDATE subscribers
             SET active = 1, role = ?, tech_stack = ?, subscribed_at = ?
             WHERE email = ?
-        """, (role.lower(), json.dumps([t.lower() for t in tech_stack]), datetime.now().isoformat(), email))
+        """, (role.lower(), json.dumps(normalized_categories), datetime.now().isoformat(), email))
         conn.commit()
         conn.close()
 
         if existing["active"]:
-            return {"message": "Preferences updated successfully", "email": email, "role": role, "tech_stack": tech_stack}
+            return {"message": "Preferences updated successfully", "email": email, "role": role, "categories": normalized_categories}
         else:
-            return {"message": "Subscription reactivated", "email": email, "role": role, "tech_stack": tech_stack}
+            return {"message": "Subscription reactivated", "email": email, "role": role, "categories": normalized_categories}
     
     # New subscription
     try:
+        # Store categories in tech_stack column for backward compatibility
         c.execute("""
             INSERT INTO subscribers (email, role, tech_stack, subscribed_at, active)
             VALUES (?, ?, ?, ?, 1)
-        """, (email, role.lower(), json.dumps([t.lower() for t in tech_stack]), datetime.now().isoformat()))
+        """, (email, role.lower(), json.dumps(normalized_categories), datetime.now().isoformat()))
         conn.commit()
         conn.close()
 
         # Send welcome newsletter in background with 5 personalized articles
-        background_tasks.add_task(send_welcome_newsletter, email, role.lower(), [t.lower() for t in tech_stack])
+        background_tasks.add_task(send_welcome_newsletter, email, role.lower(), normalized_categories)
 
-        return {"message": "Successfully subscribed", "email": email, "role": role, "tech_stack": tech_stack}
+        return {"message": "Successfully subscribed", "email": email, "role": role, "categories": normalized_categories}
     except Exception as e:
         conn.close()
         raise HTTPException(status_code=500, detail=f"Failed to subscribe: {str(e)}")

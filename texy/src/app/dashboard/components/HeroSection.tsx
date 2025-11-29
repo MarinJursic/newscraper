@@ -1,5 +1,6 @@
 import React from 'react';
 import { Play, Pause } from 'lucide-react';
+import { useAuthStore } from '@/store/authStore';
 
 interface HeroSectionProps {
     activeCategory: string;
@@ -8,6 +9,10 @@ interface HeroSectionProps {
 }
 
 const HeroSection: React.FC<HeroSectionProps> = ({ activeCategory, isPlaying, setIsPlaying }) => {
+    const user = useAuthStore((state) => state.user);
+    
+    // Extract name from email (part before @) or use email as fallback
+    const userName = user?.email ? user.email.split('@')[0] : 'User';
     const getHeroStyles = () => {
         switch (activeCategory) {
             case 'Security': return 'bg-red-50/30 border-red-100';
@@ -24,8 +29,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({ activeCategory, isPlaying, se
         <div className={`rounded-3xl border shadow-sm overflow-hidden transition-colors duration-500 ${getHeroStyles()}`}>
             <div className="flex flex-col md:flex-row">
                 <div className="md:w-[75%] p-8 flex flex-col justify-center">
-                    <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
-                        {activeCategory === 'All' ? 'Good Morning, User.' : `State of ${activeCategory}.`}
+                    <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-4 animate-in fade-in slide-in-from-bottom-2 duration-500" suppressHydrationWarning>
+                        {activeCategory === 'All' ? `Good Morning, ${userName}.` : `State of ${activeCategory}.`}
                     </h1>
                     <p className="text-slate-600 text-lg leading-relaxed">
                         {activeCategory === 'All'

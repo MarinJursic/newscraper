@@ -232,7 +232,6 @@ const ArticleDetail = () => {
   const [selection, setSelection] = useState<SelectionState | null>(null);
   const [activeTab, setActiveTab] = useState<"chat" | "notes">("notes");
   const [editingNote, setEditingNote] = useState("");
-  const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
 
   const contentRef = useRef<HTMLDivElement>(null);
   const noteInputRef = useRef<HTMLInputElement>(null);
@@ -264,6 +263,47 @@ const ArticleDetail = () => {
     return article.content.long_description
       .split("\n")
       .filter((p) => p.trim().length > 0);
+  }, [article]);
+
+  // Extract Keywords for sidebar safely (fallback to array of strings if needed)
+  const sidebarKeywords = useMemo(() => {
+    return article?.metadata?.keywords || [];
+  }, [article]);
+
+  // Create article context for chat
+  const articleContext = useMemo(() => {
+    if (!article) return "";
+
+    const keywordStrings =
+      article.metadata?.keywords?.map((k) => {
+        if (typeof k === "string") return k;
+        if (typeof k === "object" && k !== null && "keyword" in k) {
+          return (k as { keyword: string }).keyword;
+        }
+        return String(k);
+      }) || [];
+
+    const parts = [
+      `Title: ${article.title}`,
+      article.content?.short_description
+        ? `Summary: ${article.content.short_description}`
+        : "",
+      article.content?.long_description
+        ? `Content: ${article.content.long_description}`
+        : "",
+      article.classification?.category
+        ? `Category: ${article.classification.category}`
+        : "",
+      article.classification?.tags?.length
+        ? `Tags: ${article.classification.tags.join(", ")}`
+        : "",
+      keywordStrings.length > 0 ? `Keywords: ${keywordStrings.join(", ")}` : "",
+      article.scores
+        ? `Confidence: ${article.scores.confidence_score}%, Relevance: ${article.scores.relevance_score}%`
+        : "",
+    ];
+
+    return parts.filter(Boolean).join("\n\n");
   }, [article]);
 
   // 5. Highlight Logic
@@ -371,9 +411,6 @@ const ArticleDetail = () => {
       </div>
     );
   }
-
-  // Extract Keywords for sidebar safely (fallback to array of strings if needed)
-  const sidebarKeywords = article.metadata?.keywords || [];
 
   return (
     <div>
@@ -493,8 +530,6 @@ const ArticleDetail = () => {
                 article.visual_data.geo_impact.length > 0 && (
                   <ExpandableGeoMap
                     locations={article.visual_data.geo_impact}
-                    selectedLocation={selectedLocation}
-                    onLocationSelect={setSelectedLocation}
                   />
                 )}
 
@@ -554,6 +589,7 @@ const ArticleDetail = () => {
                 highlights={highlights}
                 updateNote={updateNote}
                 deleteHighlight={deleteHighlight}
+                articleContext={articleContext}
               />
             </div>
           </div>

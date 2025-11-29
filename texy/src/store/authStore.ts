@@ -4,7 +4,7 @@ import { persist } from 'zustand/middleware';
 export interface User {
   email: string;
   role: string;
-  tech_stack: string[];
+  categories: string[];
 }
 
 interface AuthState {

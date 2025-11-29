@@ -10,8 +10,6 @@ interface GeoLocation {
 
 interface GeoImpactWidgetProps {
   locations?: GeoLocation[];
-  selectedLocation?: string | null;
-  onLocationSelect?: (isoCode: string | null) => void;
 }
 
 // Približne koordinate na standardnoj World Map projekciji (u postocima)
@@ -24,11 +22,7 @@ const COORDINATES: Record<string, { top: string; left: string }> = {
   default: { top: "50%", left: "50%" },
 };
 
-const GeoImpactWidget = ({
-  locations = [],
-  selectedLocation,
-  onLocationSelect,
-}: GeoImpactWidgetProps) => {
+const GeoImpactWidget = ({ locations = [] }: GeoImpactWidgetProps) => {
   // Ako nema podataka, ne prikazujemo ništa ili default
   const activeLocations = locations.length > 0 ? locations : [];
 
@@ -59,34 +53,21 @@ const GeoImpactWidget = ({
           const coords = COORDINATES[loc.iso_code] || COORDINATES["default"];
           const isSevere = loc.severity >= 3;
 
-          const isSelected = selectedLocation === loc.iso_code;
-
           return (
             <div
               key={loc.iso_code}
-              className="absolute cursor-pointer group/dot"
+              className="absolute cursor-help group/dot"
               style={{ top: coords.top, left: coords.left }}
-              onClick={() =>
-                onLocationSelect?.(isSelected ? null : loc.iso_code)
-              }
             >
               <span className="relative flex h-3 w-3">
                 <span
                   className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
-                    isSelected
-                      ? "bg-blue-400"
-                      : isSevere
-                      ? "bg-red-400"
-                      : "bg-orange-400"
+                    isSevere ? "bg-red-400" : "bg-orange-400"
                   }`}
                 ></span>
                 <span
                   className={`relative inline-flex rounded-full h-3 w-3 ${
-                    isSelected
-                      ? "bg-blue-600 ring-2 ring-blue-300 ring-offset-2"
-                      : isSevere
-                      ? "bg-red-600"
-                      : "bg-orange-500"
+                    isSevere ? "bg-red-600" : "bg-orange-500"
                   }`}
                 ></span>
               </span>
@@ -111,39 +92,25 @@ const GeoImpactWidget = ({
 
       {/* Footer List */}
       <div className="mt-3 space-y-1">
-        {activeLocations.map((loc) => {
-          const isSelected = selectedLocation === loc.iso_code;
-          return (
-            <div
-              key={loc.iso_code}
-              className={`flex items-center justify-between text-xs p-1.5 rounded cursor-pointer transition-colors ${
-                isSelected
-                  ? "bg-blue-50 border border-blue-200"
-                  : "hover:bg-gray-50"
+        {activeLocations.map((loc) => (
+          <div
+            key={loc.iso_code}
+            className="flex items-center justify-between text-xs"
+          >
+            <span className="text-slate-600 font-medium">
+              {loc.country_name}
+            </span>
+            <span
+              className={`px-1.5 py-0.5 rounded text-[10px] ${
+                loc.severity >= 3
+                  ? "bg-red-100 text-red-700"
+                  : "bg-orange-50 text-orange-600"
               }`}
-              onClick={() =>
-                onLocationSelect?.(isSelected ? null : loc.iso_code)
-              }
             >
-              <span
-                className={`font-medium ${
-                  isSelected ? "text-blue-700" : "text-slate-600"
-                }`}
-              >
-                {loc.country_name}
-              </span>
-              <span
-                className={`px-1.5 py-0.5 rounded text-[10px] ${
-                  loc.severity >= 3
-                    ? "bg-red-100 text-red-700"
-                    : "bg-orange-50 text-orange-600"
-                }`}
-              >
-                Sev: {loc.severity}/5
-              </span>
-            </div>
-          );
-        })}
+              Sev: {loc.severity}/5
+            </span>
+          </div>
+        ))}
       </div>
     </div>
   );

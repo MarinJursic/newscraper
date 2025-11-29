@@ -4,7 +4,7 @@ from typing import List, Dict, Any
 import os
 
 from database import get_db_connection
-from config import COUNTRY_DATA
+from config import COUNTRY_DATA, LEGACY_CATEGORIES
 
 # Email configuration - Using Resend API
 RESEND_API_KEY = os.getenv("RESEND_API_KEY", "")
@@ -23,9 +23,9 @@ ROLE_KEYWORDS = {
     "data/ai": ["ai", "machine learning", "data science", "llm", "gpt", "neural network", "tensorflow", "pytorch", "data pipeline"]
 }
 
-def match_articles_to_preferences(role: str, tech_stack: List[str], articles: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def match_articles_to_preferences(role: str, categories: List[str], articles: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """
-    Match articles to subscriber preferences based on role and tech stack.
+    Match articles to subscriber preferences based on role and categories.
     
     Returns articles sorted by relevance to the subscriber.
     """
@@ -38,11 +38,11 @@ def match_articles_to_preferences(role: str, tech_stack: List[str], articles: Li
         title = (article.get("title") or "").lower()
         short_desc = (article.get("content", {}).get("short_description") or "").lower()
         long_desc = (article.get("content", {}).get("long_description") or "").lower()
-        category = (article.get("classification", {}).get("category") or "").lower()
+        article_category = (article.get("classification", {}).get("category") or "").lower()
         tags = article.get("classification", {}).get("tags") or []
         keywords = article.get("metadata", {}).get("keywords") or []
         
-        combined_text = f"{title} {short_desc} {long_desc} {category}"
+        combined_text = f"{title} {short_desc} {long_desc} {article_category}"
         
         # Role matching
         role_kws = ROLE_KEYWORDS.get(role.lower(), [])
@@ -52,15 +52,30 @@ def match_articles_to_preferences(role: str, tech_stack: List[str], articles: Li
             if any(kw.lower() in str(tag).lower() for tag in tags):
                 score += 2
         
-        # Tech stack matching
-        for tech in tech_stack:
-            tech_lower = tech.lower()
-            if tech_lower in combined_text:
-                score += 5
-            if any(tech_lower in str(tag).lower() for tag in tags):
-                score += 3
-            if any(tech_lower in str(kw.get("keyword", "")).lower() for kw in keywords):
-                score += 2
+        # Category matching - use keywords from LEGACY_CATEGORIES
+        for category_id in categories:
+            category_id_lower = category_id.lower()
+            category_info = LEGACY_CATEGORIES.get(category_id_lower)
+            
+            if category_info:
+                # Match against category name
+                category_name = category_info.get("name", "").lower()
+                if category_name in combined_text:
+                    score += 5
+                
+                # Match against category keywords
+                category_keywords = category_info.get("keywords", [])
+                for keyword in category_keywords:
+                    if keyword.lower() in combined_text:
+                        score += 4
+                    if any(keyword.lower() in str(tag).lower() for tag in tags):
+                        score += 3
+                    if any(keyword.lower() in str(kw.get("keyword", "")).lower() for kw in keywords):
+                        score += 2
+                
+                # Direct category match
+                if category_id_lower == article_category or category_name == article_category:
+                    score += 6
         
         # Only include if score > 0
         if score > 0:
@@ -81,7 +96,9 @@ def generate_email_html(subscriber: Dict[str, Any], articles: List[Dict[str, Any
     
     email = subscriber["email"]
     role = subscriber["role"]
-    tech_stack = json.loads(subscriber["tech_stack"])
+    categories_data = json.loads(subscriber.get("tech_stack", "[]"))  # Still stored in tech_stack column
+    # Convert category IDs to names
+    category_names = [LEGACY_CATEGORIES.get(cat.lower(), {}).get("name", cat) for cat in categories_data]
     
     html = f"""
     <html>
@@ -104,7 +121,7 @@ def generate_email_html(subscriber: Dict[str, Any], articles: List[Dict[str, Any
     <body>
         <div class="header">
             <h1>🔒 Your Daily Cybersecurity Digest</h1>
-            <p>Personalized for: {role.title()} | {', '.join(tech_stack)}</p>
+            <p>Personalized for: {role.title()} | {', '.join(category_names) if category_names else 'All categories'}</p>
         </div>
     """
     
@@ -196,14 +213,14 @@ def send_email(to_email: str, subject: str, html_content: str) -> bool:
         return False
 
 
-def send_welcome_newsletter(email: str, role: str, tech_stack: List[str]) -> bool:
+def send_welcome_newsletter(email: str, role: str, categories: List[str]) -> bool:
     """
     Send welcome newsletter to new subscriber with 5 most relevant articles.
 
     Args:
         email: Subscriber email
         role: Subscriber role
-        tech_stack: List of technologies
+        categories: List of category IDs
 
     Returns:
         True if email was sent successfully, False otherwise
@@ -250,17 +267,18 @@ def send_welcome_newsletter(email: str, role: str, tech_stack: List[str]) -> boo
         articles.append(parsed)
 
     # Match articles to preferences and get top 5
-    matched = match_articles_to_preferences(role, tech_stack, articles)[:5]
+    matched = match_articles_to_preferences(role, categories, articles)[:5]
 
     if not matched:
         print(f"⚠️ No matching articles found for {email}, sending anyway with generic articles")
         matched = articles[:5]  # Send top 5 articles if no matches
 
     # Create subscriber dict for email generation
+    # Store categories in tech_stack field for backward compatibility with database schema
     subscriber = {
         "email": email,
         "role": role,
-        "tech_stack": json.dumps(tech_stack)
+        "tech_stack": json.dumps(categories)
     }
 
     # Generate and send welcome email
@@ -336,10 +354,11 @@ def send_daily_newsletter(days_back: int = 1) -> Dict[str, Any]:
     for subscriber in subscribers:
         email = subscriber["email"]
         role = subscriber["role"]
-        tech_stack = json.loads(subscriber["tech_stack"])
+        # Categories are stored in tech_stack column for backward compatibility
+        categories = json.loads(subscriber["tech_stack"])
         
         # Match articles to preferences
-        matched = match_articles_to_preferences(role, tech_stack, articles)
+        matched = match_articles_to_preferences(role, categories, articles)
         
         if not matched:
             print(f"⏭️ No matching articles for {email}")

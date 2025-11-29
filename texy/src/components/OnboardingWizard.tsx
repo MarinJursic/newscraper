@@ -36,7 +36,7 @@ const OnboardingWizard = () => {
     const [formData, setFormData] = useState({
         email: '',
         role: '',
-        stack: [] as string[],
+        categories: [] as string[],
         attentionSpan: '',
     });
     const [error, setError] = useState<string | null>(null);
@@ -55,12 +55,12 @@ const OnboardingWizard = () => {
         }
     };
 
-    const toggleStack = (tech: string) => {
+    const toggleCategory = (category: string) => {
         setFormData(prev => ({
             ...prev,
-            stack: prev.stack.includes(tech)
-                ? prev.stack.filter(t => t !== tech)
-                : [...prev.stack, tech]
+            categories: prev.categories.includes(category)
+                ? prev.categories.filter(c => c !== category)
+                : [...prev.categories, category]
         }));
     };
 
@@ -88,40 +88,23 @@ const OnboardingWizard = () => {
 
                     const backendRole = roleMap[formData.role] || formData.role;
 
-                    // Map tech stack to backend format (must match backend validation)
-                    const techStackMap: Record<string, string> = {
-                        'Python': 'python',
-                        'React': 'react',
-                        'AWS': 'aws',
-                        'Docker': 'docker',
-                        'CyberSec': 'cybersec',
-                        'Crypto': 'crypto',
-                        'AI': 'ai',
-                        'Rust': 'rust',
-                        'Go': 'go',
-                        'Kubernetes': 'kubernetes',
-                        'Design': 'design',
-                        'GraphQL': 'graphql',
-                        'Node.js': 'node.js',  // Keep the dot!
-                        'Next.js': 'next.js'   // Keep the dot!
-                    };
+                    // Categories are already in the correct format (category IDs)
+                    const categories = formData.categories.map(cat => cat.toLowerCase());
 
-                    const techStack = formData.stack.map(tech => techStackMap[tech] || tech.toLowerCase());
-
-                    console.log('Subscribing user:', { email: formData.email, role: backendRole, tech_stack: techStack });
+                    console.log('Subscribing user:', { email: formData.email, role: backendRole, categories: categories });
 
                     // Subscribe user to backend
                     await subscribeUser({
                         email: formData.email,
                         role: backendRole,
-                        tech_stack: techStack
+                        categories: categories
                     });
 
                     // Save to auth store
                     login({
                         email: formData.email,
                         role: formData.role,
-                        tech_stack: formData.stack
+                        categories: formData.categories
                     });
 
                     setCalibrationText('Analyzing 1,400 sources...');
@@ -267,13 +250,32 @@ const OnboardingWizard = () => {
                             <div className="w-48 h-48 border border-dashed border-gray-200 rounded-full animate-reverse-spin"></div>
                         </div>
                         <div className="relative z-10 grid grid-cols-2 gap-4">
-                            {formData.stack.map((tech, idx) => (
-                                <div key={tech} className="bg-white px-4 py-2 rounded-lg shadow-md border border-gray-100 text-sm font-medium text-slate-700 animate-in zoom-in duration-300" style={{ animationDelay: `${idx * 100}ms` }}>
-                                    {tech}
-                                </div>
-                            ))}
-                            {formData.stack.length === 0 && (
-                                <div className="text-slate-400 text-sm font-medium">Select your stack...</div>
+                            {formData.categories.map((category, idx) => {
+                                const categoryNames: Record<string, string> = {
+                                    'malware': 'Malware',
+                                    'vulnerability': 'Vulnerability',
+                                    'data_breach': 'Data Breach',
+                                    'ransomware': 'Ransomware',
+                                    'phishing': 'Phishing',
+                                    'apt': 'APT & Nation-State',
+                                    'privacy': 'Privacy',
+                                    'cloud': 'Cloud Security',
+                                    'mobile': 'Mobile Security',
+                                    'iot': 'IoT & Hardware',
+                                    'crypto': 'Cryptocurrency',
+                                    'ai': 'AI & Machine Learning',
+                                    'regulation': 'Law & Regulation',
+                                    'enterprise': 'Enterprise Security',
+                                    'authentication': 'Authentication'
+                                };
+                                return (
+                                    <div key={category} className="bg-white px-4 py-2 rounded-lg shadow-md border border-gray-100 text-sm font-medium text-slate-700 animate-in zoom-in duration-300" style={{ animationDelay: `${idx * 100}ms` }}>
+                                        {categoryNames[category] || category}
+                                    </div>
+                                );
+                            })}
+                            {formData.categories.length === 0 && (
+                                <div className="text-slate-400 text-sm font-medium">Select your categories...</div>
                             )}
                         </div>
                     </div>
@@ -341,6 +343,58 @@ const OnboardingWizard = () => {
                                     <span className="text-sm">Select density...</span>
                                 </div>
                             )}
+                        </div>
+                    </div>
+                );
+            case 'calibration':
+                return (
+                    <div className="space-y-6 animate-in fade-in duration-500">
+                        <div className="bg-white p-6 rounded-2xl shadow-xl border border-gray-100">
+                            <div className="flex items-center justify-between mb-6">
+                                <div className="font-semibold text-slate-900">Your Dashboard</div>
+                                <div className="text-xs text-slate-500">Coming Soon</div>
+                            </div>
+                            
+                            {/* Preview Article Cards */}
+                            <div className="space-y-4">
+                                <div className="bg-gradient-to-br from-violet-50 to-blue-50 p-4 rounded-xl border border-violet-100">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <div className="w-2 h-2 rounded-full bg-violet-500"></div>
+                                        <span className="text-xs font-medium text-violet-700">Personalized</span>
+                                    </div>
+                                    <h4 className="font-semibold text-slate-900 text-sm mb-2">AI-Curated Intelligence</h4>
+                                    <p className="text-xs text-slate-600 leading-relaxed">Articles matched to your role and selected categories are being prepared...</p>
+                                </div>
+                                
+                                <div className="bg-white p-4 rounded-xl border border-gray-200 space-y-2">
+                                    <div className="h-3 w-3/4 bg-gray-100 rounded"></div>
+                                    <div className="h-2 w-full bg-gray-50 rounded"></div>
+                                    <div className="h-2 w-5/6 bg-gray-50 rounded"></div>
+                                    <div className="flex gap-2 mt-3">
+                                        <div className="h-4 w-16 bg-violet-100 rounded"></div>
+                                        <div className="h-4 w-20 bg-gray-100 rounded"></div>
+                                    </div>
+                                </div>
+                                
+                                <div className="bg-white p-4 rounded-xl border border-gray-200 space-y-2 opacity-60">
+                                    <div className="h-3 w-2/3 bg-gray-100 rounded"></div>
+                                    <div className="h-2 w-full bg-gray-50 rounded"></div>
+                                    <div className="h-2 w-4/5 bg-gray-50 rounded"></div>
+                                </div>
+                            </div>
+                            
+                            {/* Progress Indicator */}
+                            <div className="mt-6 pt-6 border-t border-gray-100">
+                                <div className="flex items-center justify-between text-xs text-slate-500 mb-2">
+                                    <span>Setting up your feed...</span>
+                                    <span className="font-medium text-violet-600">Almost there</span>
+                                </div>
+                                <div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
+                                    <div className="bg-gradient-to-r from-violet-500 to-blue-500 h-full rounded-full w-3/4 relative">
+                                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse"></div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 );
@@ -523,32 +577,48 @@ const OnboardingWizard = () => {
                         </div>
                     )}
 
-                    {/* Step 3: The Stack */}
+                    {/* Step 3: Categories */}
                     {currentStep === 'stack' && (
                         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                            <h2 className="text-3xl font-bold mb-2">What's in your stack?</h2>
-                            <p className="text-slate-500 mb-8">Select at least 3 topics.</p>
+                            <h2 className="text-3xl font-bold mb-2">What categories interest you?</h2>
+                            <p className="text-slate-500 mb-8">Select at least 3 categories.</p>
 
                             <div className="flex flex-wrap gap-3 mb-8">
-                                {['Python', 'React', 'AWS', 'Docker', 'CyberSec', 'Crypto', 'AI', 'Rust', 'Go', 'Kubernetes', 'Design', 'GraphQL', 'Node.js', 'Next.js'].map((tech) => (
+                                {[
+                                    { id: 'malware', name: 'Malware' },
+                                    { id: 'vulnerability', name: 'Vulnerability' },
+                                    { id: 'data_breach', name: 'Data Breach' },
+                                    { id: 'ransomware', name: 'Ransomware' },
+                                    { id: 'phishing', name: 'Phishing' },
+                                    { id: 'apt', name: 'APT & Nation-State' },
+                                    { id: 'privacy', name: 'Privacy' },
+                                    { id: 'cloud', name: 'Cloud Security' },
+                                    { id: 'mobile', name: 'Mobile Security' },
+                                    { id: 'iot', name: 'IoT & Hardware' },
+                                    { id: 'crypto', name: 'Cryptocurrency' },
+                                    { id: 'ai', name: 'AI & Machine Learning' },
+                                    { id: 'regulation', name: 'Law & Regulation' },
+                                    { id: 'enterprise', name: 'Enterprise Security' },
+                                    { id: 'authentication', name: 'Authentication' }
+                                ].map((category) => (
                                     <button
-                                        key={tech}
-                                        onClick={() => toggleStack(tech)}
-                                        className={`px-4 py-2 rounded-full border transition-all flex items-center gap-2 ${formData.stack.includes(tech)
+                                        key={category.id}
+                                        onClick={() => toggleCategory(category.id)}
+                                        className={`px-4 py-2 rounded-full border transition-all flex items-center gap-2 ${formData.categories.includes(category.id)
                                             ? 'bg-violet-600 border-violet-600 text-white shadow-md shadow-violet-200'
                                             : 'bg-white border-gray-200 text-slate-600 hover:border-violet-300'
                                             }`}
                                     >
-                                        {tech}
-                                        {formData.stack.includes(tech) && <Check className="w-3 h-3" />}
+                                        {category.name}
+                                        {formData.categories.includes(category.id) && <Check className="w-3 h-3" />}
                                     </button>
                                 ))}
                             </div>
 
                             <button
                                 onClick={() => handleNext('attention')}
-                                disabled={formData.stack.length < 3}
-                                className={`w-full p-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 ${formData.stack.length >= 3
+                                disabled={formData.categories.length < 3}
+                                className={`w-full p-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 ${formData.categories.length >= 3
                                     ? 'bg-violet-600 text-white hover:bg-violet-700'
                                     : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                                     }`}

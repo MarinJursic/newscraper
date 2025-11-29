@@ -1,11 +1,11 @@
 "use client";
 
-import { Play, FileText, Headphones, Globe, ArrowRight, Shield, Activity, CheckCircle } from 'lucide-react';
+import { Play, FileText, Headphones, Globe, ArrowRight, Shield, Activity, CheckCircle, CheckCircle2, TrendingUp, ArrowUpRight, Home, Hash, Bookmark, Folder } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { useEffect } from 'react';
 
-export default function Home() {
+export default function LandingPage() {
   const router = useRouter();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
@@ -98,49 +98,193 @@ export default function Home() {
             </div>
 
             {/* Mockup Content */}
-            <div className="p-8 bg-white grid grid-cols-12 gap-6 text-left h-[500px] overflow-hidden">
+            <div className="bg-white grid grid-cols-12 text-left h-[500px] overflow-hidden">
               {/* Sidebar */}
-              <div className="col-span-3 border-r border-gray-100 pr-6 hidden md:block">
+              <div className="col-span-3 border-r border-gray-200 bg-white p-5 hidden md:flex flex-col justify-between">
                 <div className="space-y-6">
-                  <div className="h-8 w-24 bg-gray-100 rounded-md"></div>
-                  <div className="space-y-3">
-                    <div className="h-4 w-full bg-gray-50 rounded"></div>
-                    <div className="h-4 w-3/4 bg-gray-50 rounded"></div>
-                    <div className="h-4 w-5/6 bg-gray-50 rounded"></div>
+                  {/* Logo */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-xl font-bold font-serif tracking-tight text-slate-900">
+                      Blinkfeed.
+                    </span>
+                  </div>
+
+                  {/* Nav Links */}
+                  <nav className="space-y-1">
+                    <div className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg bg-slate-100 text-slate-900">
+                      <Home className="w-5 h-5" />
+                      <span className="font-medium">Home</span>
+                    </div>
+                    <div className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-500 hover:bg-gray-50">
+                      <Hash className="w-5 h-5" />
+                      <span className="font-medium">Explore</span>
+                    </div>
+                    <div className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-500 hover:bg-gray-50">
+                      <Globe className="w-5 h-5" />
+                      <span className="font-medium">Impact Map</span>
+                    </div>
+                    
+                    <div className="h-px bg-gray-200 my-2"></div>
+                    
+                    <div className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-500 hover:bg-gray-50">
+                      <Bookmark className="w-5 h-5" />
+                      <span className="font-medium">Saved</span>
+                    </div>
+                    <div className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-500 hover:bg-gray-50">
+                      <Folder className="w-5 h-5" />
+                      <span className="font-medium">History</span>
+                    </div>
+                  </nav>
+                </div>
+
+                {/* User Section */}
+                <div className="pt-4 border-t border-gray-200">
+                  <div className="flex items-center gap-3 px-3 py-2">
+                    <div className="w-8 h-8 bg-violet-100 rounded-full flex items-center justify-center">
+                      <span className="text-violet-600 font-bold text-sm">JD</span>
+                    </div>
+                    <div className="flex-1">
+                      <div className="h-3 w-20 bg-gray-200 rounded mb-1"></div>
+                      <div className="h-2 w-32 bg-gray-100 rounded"></div>
+                    </div>
                   </div>
                 </div>
               </div>
 
               {/* Main Feed */}
-              <div className="col-span-12 md:col-span-9 space-y-6">
-                <div className="flex justify-between items-center mb-8">
-                  <div className="h-8 w-48 bg-gray-100 rounded-md"></div>
-                  <div className="h-8 w-8 bg-gray-100 rounded-full"></div>
+              <div className="col-span-12 md:col-span-9 flex flex-col h-full">
+                {/* Header with Category Filters */}
+                <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-gray-200 px-6 py-4">
+                  <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
+                    <button className="px-4 py-1.5 rounded-full text-sm font-medium bg-slate-900 text-white shadow-md whitespace-nowrap flex-shrink-0">
+                      All
+                    </button>
+                    <button className="px-4 py-1.5 rounded-full text-sm font-medium bg-gray-100 text-slate-600 hover:bg-gray-200 whitespace-nowrap flex-shrink-0">
+                      Security
+                    </button>
+                    <button className="px-4 py-1.5 rounded-full text-sm font-medium bg-gray-100 text-slate-600 hover:bg-gray-200 whitespace-nowrap flex-shrink-0">
+                      AI
+                    </button>
+                    <button className="px-4 py-1.5 rounded-full text-sm font-medium bg-gray-100 text-slate-600 hover:bg-gray-200 whitespace-nowrap flex-shrink-0">
+                      Legal
+                    </button>
+                    <button className="px-4 py-1.5 rounded-full text-sm font-medium bg-gray-100 text-slate-600 hover:bg-gray-200 whitespace-nowrap flex-shrink-0">
+                      Market
+                    </button>
+                    <button className="px-4 py-1.5 rounded-full text-sm font-medium bg-gray-100 text-slate-600 hover:bg-gray-200 whitespace-nowrap flex-shrink-0">
+                      DevOps
+                    </button>
+                  </div>
                 </div>
 
-                {/* Article Card 1 */}
-                <div className="p-6 rounded-xl border border-gray-100 bg-gray-50/50 space-y-4">
-                  <div className="flex justify-between items-start">
-                    <div className="h-6 w-2/3 bg-gray-200 rounded"></div>
-                    <div className="h-6 w-16 bg-violet-100 rounded-full"></div>
+                {/* Content Area */}
+                <div className="flex-1 overflow-y-auto p-6 space-y-6">
+
+                {/* Realistic Article Card 1 */}
+                <div className="p-6 rounded-xl border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all cursor-pointer group">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                        The Hacker News
+                      </span>
+                      <span className="text-slate-300">•</span>
+                      <span className="text-[10px] text-slate-400">
+                        2 hours ago
+                      </span>
+                      <span className="text-slate-300">•</span>
+                      <span className="text-[10px] text-violet-600 font-medium flex items-center gap-1">
+                        <CheckCircle2 className="w-3 h-3" />
+                        Actionable
+                      </span>
+                    </div>
+                    <div className="w-1.5 h-1.5 rounded-full bg-red-500"></div>
                   </div>
-                  <div className="space-y-2">
-                    <div className="h-4 w-full bg-gray-100 rounded"></div>
-                    <div className="h-4 w-full bg-gray-100 rounded"></div>
-                    <div className="h-4 w-2/3 bg-gray-100 rounded"></div>
+
+                  <h3 className="text-base font-bold text-slate-900 mb-3 leading-snug group-hover:text-violet-600 transition-colors">
+                    Critical Zero-Day Vulnerability Discovered in Popular Authentication Framework
+                  </h3>
+                  
+                  <p className="text-slate-500 text-sm leading-relaxed mb-4 line-clamp-3">
+                    Security researchers have identified a zero-day vulnerability in a widely-used authentication library that could allow attackers to bypass multi-factor authentication. The flaw affects over 2.3 million applications globally. Immediate patching is recommended for organizations using affected versions.
+                  </p>
+
+                  {/* Tags */}
+                  <div className="flex flex-wrap gap-1.5 mb-4">
+                    <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md">
+                      Zero-Day
+                    </span>
+                    <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md">
+                      Authentication
+                    </span>
+                    <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md">
+                      Critical
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-4 border-t border-gray-50">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-medium px-2 py-1 rounded-md text-red-700 bg-red-50">
+                        Security
+                      </span>
+                      <span className="text-[10px] text-emerald-600 bg-emerald-50 font-medium flex items-center gap-1 px-1.5 py-0.5 rounded">
+                        <ArrowUpRight className="w-3 h-3" />
+                        87%
+                      </span>
+                      <span className="text-[10px] text-violet-600 font-medium flex items-center gap-1">
+                        <TrendingUp className="w-3 h-3" />
+                        92
+                      </span>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-violet-600 transition-colors" />
                   </div>
                 </div>
 
-                {/* Article Card 2 */}
-                <div className="p-6 rounded-xl border border-gray-100 bg-gray-50/50 space-y-4 opacity-60">
-                  <div className="flex justify-between items-start">
-                    <div className="h-6 w-1/2 bg-gray-200 rounded"></div>
-                    <div className="h-6 w-16 bg-violet-100 rounded-full"></div>
+                {/* Realistic Article Card 2 */}
+                <div className="p-6 rounded-xl border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all cursor-pointer group opacity-75">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                        The Hacker News
+                      </span>
+                      <span className="text-slate-300">•</span>
+                      <span className="text-[10px] text-slate-400">
+                        5 hours ago
+                      </span>
+                    </div>
+                    <div className="w-1.5 h-1.5 rounded-full bg-gray-300"></div>
                   </div>
-                  <div className="space-y-2">
-                    <div className="h-4 w-full bg-gray-100 rounded"></div>
-                    <div className="h-4 w-3/4 bg-gray-100 rounded"></div>
+
+                  <h3 className="text-base font-bold text-slate-900 mb-3 leading-snug group-hover:text-violet-600 transition-colors">
+                    New AI-Powered Threat Detection System Reduces False Positives by 94%
+                  </h3>
+                  
+                  <p className="text-slate-500 text-sm leading-relaxed mb-4 line-clamp-2">
+                    A machine learning model trained on 10 years of security incident data has achieved unprecedented accuracy in identifying real threats while dramatically reducing false alarms.
+                  </p>
+
+                  {/* Tags */}
+                  <div className="flex flex-wrap gap-1.5 mb-4">
+                    <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md">
+                      AI
+                    </span>
+                    <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md">
+                      Threat Detection
+                    </span>
                   </div>
+
+                  <div className="flex items-center justify-between pt-4 border-t border-gray-50">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-medium px-2 py-1 rounded-md text-emerald-700 bg-emerald-50">
+                        AI
+                      </span>
+                      <span className="text-[10px] text-violet-600 font-medium flex items-center gap-1">
+                        <TrendingUp className="w-3 h-3" />
+                        78
+                      </span>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-violet-600 transition-colors" />
+                  </div>
+                </div>
                 </div>
               </div>
             </div>
