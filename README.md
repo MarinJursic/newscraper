@@ -51,25 +51,11 @@ This work is licensed under a
 
 1. Database (MySQL)
 
-- Create database and user (example):
-  sudo -u postgres psql -c "CREATE USER disccount WITH PASSWORD 'secret';"
-  sudo -u postgres psql -c "CREATE DATABASE disccount OWNER disccount;"
-- Adjust names/passwords as needed.
+- _TODO_
 
 2. Backend setup
 
-- Copy/configure environment variables (backend expects):
-  - SPRING_DATASOURCE_URL (e.g. jdbc:postgresql://localhost:5432/disscount)
-  - SPRING_DATASOURCE_USERNAME
-  - SPRING_DATASOURCE_PASSWORD
-  - JWT_SECRET (strong random string)
-- You can copy `.env.example` to `.env` in the backend folder if present.
-- Build and run:
-  cd backend
-  mvn clean install
-  mvn spring-boot:run
-- The backend starts on port 8080 by default. Open API docs at:
-  http://localhost:8080/api-docs
+- _TODO_
 
 ### Running the frontend
 
