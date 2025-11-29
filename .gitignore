@@ -1,0 +1,53 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg
+*.egg-info/
+.eggs/
+
+# Virtual environments
+venv/
+env/
+.venv/
+.env/
+
+# Database
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# Generated files
+articles_enriched.json
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Node (for texy frontend)
+node_modules/
+.next/
+out/
+build/
+*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Misc
+*.bak
+*.tmp
+.cache/
+
