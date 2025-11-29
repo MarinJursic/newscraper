@@ -200,7 +200,7 @@ const SavedArticlesPage = () => {
                                 <button
                                     key={folder.id}
                                     onClick={() => setActiveFolder(folder.id)}
-                                    className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap flex-shrink-0 flex items-center gap-2 ${activeFolder === folder.id
+                                    className={`cursor-pointer px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap flex-shrink-0 flex items-center gap-2 ${activeFolder === folder.id
                                         ? 'bg-slate-900 text-white shadow-md'
                                         : 'bg-gray-100 text-slate-600 hover:bg-gray-200 hover:text-slate-900'
                                         }`}
@@ -212,7 +212,7 @@ const SavedArticlesPage = () => {
 
                             <button
                                 onClick={() => setShowNewFolderModal(true)}
-                                className="px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap flex-shrink-0 flex items-center gap-2 border-2 border-dashed border-gray-300 text-slate-600 hover:border-violet-400 hover:text-violet-600 hover:bg-violet-50"
+                                className="cursor-pointer px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap flex-shrink-0 flex items-center gap-2 border-2 border-dashed border-gray-300 text-slate-600 hover:border-violet-400 hover:text-violet-600 hover:bg-violet-50"
                             >
                                 <Plus className="w-4 h-4" />
                                 New Collection

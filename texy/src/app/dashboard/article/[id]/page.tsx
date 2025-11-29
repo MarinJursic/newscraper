@@ -2,11 +2,13 @@
 
 import React, { useState, useRef } from 'react';
 import { Bookmark, ExternalLink, Share2 } from 'lucide-react';
-import SidebarComponent from '../components/Sidebar';
-import GeoImpactWidget from '../components/GeoImpactWidget';
-import KeywordsWidget from '../components/KeywordsWidget';
-import IntelligenceSidebar from '../components/IntelligenceSidebar';
-import NoteInput from '../components/NoteInput';
+import SidebarComponent from '../../components/Sidebar';
+import GeoImpactWidget from '../../components/GeoImpactWidget';
+import KeywordsWidget from '../../components/KeywordsWidget';
+import IntelligenceSidebar from '../../components/IntelligenceSidebar';
+import NoteInput from '../../components/NoteInput';
+import { useFilteredArticles } from '@/hooks/useArticles';
+import { usePathname } from 'next/navigation';
 
 interface Highlight {
     id: string;
@@ -50,6 +52,14 @@ const ARTICLE_CONTENT = {
 };
 
 const ArticleDetail = () => {
+
+    const pathname = usePathname();
+    const { articles } = useFilteredArticles();
+    const articleId = pathname.split('/').pop();
+    const article = articles.find((article) => article.id === articleId);
+
+    console.log(pathname, article);
+
     const [isSaved, setIsSaved] = useState(false);
     const [highlights, setHighlights] = useState<Highlight[]>([]);
     const [selection, setSelection] = useState<SelectionState | null>(null);

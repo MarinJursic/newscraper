@@ -1,10 +1,8 @@
 import React from 'react';
 import { Play, Pause } from 'lucide-react';
 
-type Category = 'All' | 'Python' | 'Security' | 'AI' | 'Startups' | 'Crypto';
-
 interface HeroSectionProps {
-    activeCategory: Category;
+    activeCategory: string;
     isPlaying: boolean;
     setIsPlaying: (playing: boolean) => void;
 }
@@ -13,10 +11,11 @@ const HeroSection: React.FC<HeroSectionProps> = ({ activeCategory, isPlaying, se
     const getHeroStyles = () => {
         switch (activeCategory) {
             case 'Security': return 'bg-red-50/30 border-red-100';
-            case 'Python': return 'bg-blue-50/30 border-blue-100';
             case 'AI': return 'bg-emerald-50/30 border-emerald-100';
-            case 'Crypto': return 'bg-amber-50/30 border-amber-100';
-            case 'Startups': return 'bg-purple-50/30 border-purple-100';
+            case 'Legal': return 'bg-blue-50/30 border-blue-100';
+            case 'Market': return 'bg-purple-50/30 border-purple-100';
+            case 'DevOps': return 'bg-amber-50/30 border-amber-100';
+            case 'Product Launch': return 'bg-violet-50/30 border-violet-100';
             default: return 'bg-slate-50/30 border-slate-100';
         }
     };
@@ -30,8 +29,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({ activeCategory, isPlaying, se
                     </h1>
                     <p className="text-slate-600 text-lg leading-relaxed">
                         {activeCategory === 'All'
-                            ? 'Markets are experiencing volatility as new AI regulations are discussed in the EU. Meanwhile, a critical vulnerability in OpenSSH is causing widespread concern among security teams. In tech, Python 3.13 introduces experimental no-GIL builds.'
-                            : `Here is the latest intelligence for ${activeCategory}. Key trends indicate a shift towards more robust security protocols and increased adoption of AI-driven tools in the sector.`}
+                            ? 'Stay informed with the latest cybersecurity news, vulnerabilities, and threat intelligence. Your personalized feed brings you the most critical updates from trusted sources across the security landscape.'
+                            : `Here is the latest intelligence for ${activeCategory}. Key trends indicate evolving threats and emerging technologies in this sector.`}
                     </p>
                 </div>
 
@@ -45,7 +44,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ activeCategory, isPlaying, se
 
                     <button
                         onClick={() => setIsPlaying(!isPlaying)}
-                        className="w-14 h-14 rounded-full flex items-center justify-center text-white shadow-lg transition-all hover:scale-105 active:scale-95 bg-violet-600"
+                        className="cursor-pointer w-14 h-14 rounded-full flex items-center justify-center text-white shadow-lg transition-all hover:scale-105 active:scale-95 bg-violet-600"
                     >
                         {isPlaying ? <Pause className="w-6 h-6 fill-current" /> : <Play className="w-6 h-6 fill-current ml-1" />}
                     </button>
