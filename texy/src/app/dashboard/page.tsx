@@ -5,6 +5,8 @@ import { Search, Menu, ChevronRight, Filter, Calendar } from 'lucide-react';
 import Sidebar from './components/Sidebar';
 import HeroSection from './components/HeroSection';
 import TrendingWidget from './components/TrendingWidget';
+import { AppSidebar } from '@/components/layout/sidebar/Sidebar';
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 
 type Category = 'All' | 'Python' | 'Security' | 'AI' | 'Startups' | 'Crypto';
 
@@ -119,37 +121,20 @@ const Dashboard = () => {
     });
 
     return (
-        <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-violet-100 selection:text-violet-900 lg:grid lg:grid-cols-[260px_1fr]">
-            <Sidebar isMobileMenuOpen={isMobileMenuOpen} setIsMobileMenuOpen={setIsMobileMenuOpen} />
-
-            <main className="flex flex-col h-screen overflow-y-auto relative no-scrollbar bg-white">
-                <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-200 px-6 py-4">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4 lg:hidden">
-                            <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 -ml-2 text-slate-600">
-                                <Menu className="w-6 h-6" />
-                            </button>
+        <SidebarProvider>
+            <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-violet-100 selection:text-violet-900 flex w-full">
+                {/* <Sidebar isMobileMenuOpen={isMobileMenuOpen} setIsMobileMenuOpen={setIsMobileMenuOpen} /> */}
+                <AppSidebar />
+                <main className="flex flex-col flex-1 h-screen overflow-y-auto relative no-scrollbar bg-white">
+                    {/* Header with Sidebar Toggle */}
+                    <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-200 px-4 py-3">
+                        <div className="flex items-center gap-4">
+                            <SidebarTrigger />
                             <span className="text-xl font-bold font-serif">Texy.</span>
                         </div>
-
-                        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar mask-linear-fade w-full">
-                            {CATEGORIES.map((cat) => (
-                                <button
-                                    key={cat}
-                                    onClick={() => setActiveCategory(cat)}
-                                    className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap flex-shrink-0 ${activeCategory === cat
-                                        ? 'bg-slate-900 text-white shadow-md'
-                                        : 'bg-gray-100 text-slate-600 hover:bg-gray-200 hover:text-slate-900'
-                                        }`}
-                                >
-                                    {cat}
-                                </button>
-                            ))}
-                        </div>
                     </div>
-                </div>
 
-                <div className="p-6 lg:p-8 space-y-8 max-w-7xl mx-auto w-full">
+                    <div className="p-6 lg:p-8 space-y-8 max-w-7xl mx-auto w-full">
                     <HeroSection activeCategory={activeCategory} isPlaying={isPlaying} setIsPlaying={setIsPlaying} />
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
@@ -236,8 +221,9 @@ const Dashboard = () => {
                         </div>
                     </div>
                 </div>
-            </main>
-        </div>
+                </main>
+            </div>
+        </SidebarProvider>
     );
 };
 
