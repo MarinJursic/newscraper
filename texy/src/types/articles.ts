@@ -165,4 +165,9 @@ export interface DisplayArticle {
     image?: string;
     tags?: string[];
     trendScore?: number;
+    actionable?: boolean;
+    confidenceScore?: number;
+    relevanceScore?: number;
+    trendDirection?: string;
+    changePercent?: number;
 }
