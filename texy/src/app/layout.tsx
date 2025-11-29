@@ -23,7 +23,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} font-sans antialiased`}>
-        <Sidebar />
         <div className="ml-8">{children}</div>
       </body>
     </html>

@@ -4,7 +4,7 @@ import MapFilters from "@/components/MapFilters";
 
 export default function WorldMapPage() {
   return (
-    <div className="ml-64 mx-auto py-8">
+    <div className="ml-8 mx-auto py-8 h-full">
       <MapFilters />
       <ImpactMap />
 
