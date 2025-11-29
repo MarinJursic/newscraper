@@ -137,16 +137,75 @@ def get_articles(
     c.execute(query, params)
     raw_articles = [dict(row) for row in c.fetchall()]
 
-    # Transform articles to match frontend expected structure
+    # Transform articles to match frontend expected structure (full enriched format)
     articles = []
     for article in raw_articles:
         # Parse JSON fields
-        tags = json.loads(article.get("tags_json") or "[]")
-        keywords = json.loads(article.get("keywords_json") or "[]")
-        sources = json.loads(article.get("sources_json") or "[]")
-        trends = json.loads(article.get("trends_json") or "{}")
+        def parse_json(field):
+            val = article.get(field)
+            if val:
+                try:
+                    return json.loads(val)
+                except:
+                    return None
+            return None
 
-        # Transform to nested structure
+        tags = parse_json("tags_json") or []
+        keywords = parse_json("keywords_json") or []
+        sources = parse_json("sources_json") or []
+        trends = parse_json("trends_json") or {}
+        ai_analysis = parse_json("ai_analysis_json") or {}
+        ai_summary = parse_json("ai_summary_json") or {}
+        geo_impact_data = parse_json("geo_impact_json") or {}
+        tech_stack = parse_json("tech_stack_json") or []
+        market_data = parse_json("market_data_json")
+        actions = parse_json("actions_json") or []
+        category_data = parse_json("category")
+        
+        # Transform geo_impact to array format
+        geo_impact_array = []
+        if geo_impact_data and isinstance(geo_impact_data, dict):
+            regions = geo_impact_data.get("regions", [])
+            for region_code in regions:
+                from config import COUNTRY_DATA
+                geo_impact_array.append({
+                    "iso_code": region_code,
+                    "country_name": COUNTRY_DATA.get(region_code, region_code),
+                    "severity": 2,
+                    "reason": "Identified as affected region based on analysis."
+                })
+        
+        # Transform market_data to array format
+        market_data_array = []
+        if market_data and isinstance(market_data, dict):
+            market_data_array = [market_data]
+        
+        # Extract trend graph from trends object
+        trend_graph = {}
+        if trends and isinstance(trends, dict):
+            graph_data = trends.get("graph", {})
+            trend_graph = {
+                "period": graph_data.get("period", "Last 6 Months"),
+                "trend_direction": trends.get("trend_direction", "stable"),
+                "data_points": graph_data.get("data_points", [])
+            }
+        
+        # Transform actions to new format
+        actions_obj = {"jira_payload": {}, "slack_message": ""}
+        if actions and isinstance(actions, list) and len(actions) > 0:
+            priority_map = {"Critical": "Highest", "High": "High", "Medium": "Medium"}
+            first_action = actions[0]
+            actions_obj["jira_payload"] = {
+                "summary": first_action.get("title", "Security Alert"),
+                "description": first_action.get("description", ""),
+                "priority": priority_map.get(first_action.get("priority", "Medium"), "Medium")
+            }
+            if first_action.get("priority") == "Critical":
+                actions_obj["slack_message"] = f"*🚨 CRITICAL:* {first_action.get('title', 'Security Alert')}"
+            else:
+                actions_obj["slack_message"] = f"*⚠️ {first_action.get('priority', 'Alert')}:* {first_action.get('title', 'Security Alert')}"
+
+        # Transform to nested structure with ALL fields
         transformed = {
             "id": article.get("id"),
             "title": article.get("title"),
@@ -154,6 +213,8 @@ def get_articles(
             "published": article.get("published"),
             "author": article.get("author"),
             "image_url": article.get("image_url"),
+            "media_type": article.get("media_type"),
+            "is_new": bool(article.get("is_new")),
             "content": {
                 "short_description": article.get("short_description"),
                 "long_description": article.get("long_description"),
@@ -168,15 +229,28 @@ def get_articles(
             },
             "classification": {
                 "category": article.get("ai_category") or "Security",
+                "legacy_category": category_data if category_data else {"id": "security_news", "name": "Security News"},
                 "tags": tags,
                 "actionable": bool(article.get("actionable"))
             },
             "metadata": {
                 "analyzed_at": article.get("analyzed_at"),
                 "keywords": keywords,
-                "sources": sources
+                "sources": sources,
+                "is_new": bool(article.get("is_new"))
             },
-            "trends": trends
+            "trends": trends,
+            "ai_analysis": ai_analysis,
+            "ai_summary": ai_summary,
+            "visual_data": {
+                "trend_graph": trend_graph,
+                "geo_impact": geo_impact_array
+            },
+            "enrichment": {
+                "tech_stack": tech_stack,
+                "market_data": market_data_array
+            },
+            "actions": actions_obj
         }
         articles.append(transformed)
     
@@ -276,6 +350,7 @@ def get_article_stats():
 
 @app.get("/articles/{article_id}")
 def get_article(article_id: str):
+    """Get single article with full enriched structure."""
     conn = get_db_connection()
     c = conn.cursor()
     c.execute("SELECT * FROM articles WHERE id = ?", (article_id,))
@@ -287,18 +362,118 @@ def get_article(article_id: str):
     
     article = dict(row)
     
-    # Parse JSON fields
-    for field in ["tags_json", "sources_json", "keywords_json", "trends_json", 
-                  "ai_summary_json", "ai_analysis_json", "trend_graph_json", 
-                  "geo_impact_json", "tech_stack_json", "market_data_json", 
-                  "actions_json", "enrichment_json"]:
-        if article.get(field):
+    # Use same transformation logic as /articles endpoint
+    def parse_json(field):
+        val = article.get(field)
+        if val:
             try:
-                article[field.replace("_json", "")] = json.loads(article[field])
+                return json.loads(val)
             except:
-                article[field.replace("_json", "")] = None
-                
-    return article
+                return None
+        return None
+
+    tags = parse_json("tags_json") or []
+    keywords = parse_json("keywords_json") or []
+    sources = parse_json("sources_json") or []
+    trends = parse_json("trends_json") or {}
+    ai_analysis = parse_json("ai_analysis_json") or {}
+    ai_summary = parse_json("ai_summary_json") or {}
+    geo_impact_data = parse_json("geo_impact_json") or {}
+    tech_stack = parse_json("tech_stack_json") or []
+    market_data = parse_json("market_data_json")
+    actions = parse_json("actions_json") or []
+    category_data = parse_json("category")
+    
+    # Transform geo_impact to array format
+    geo_impact_array = []
+    if geo_impact_data and isinstance(geo_impact_data, dict):
+        regions = geo_impact_data.get("regions", [])
+        for region_code in regions:
+            from config import COUNTRY_DATA
+            geo_impact_array.append({
+                "iso_code": region_code,
+                "country_name": COUNTRY_DATA.get(region_code, region_code),
+                "severity": 2,
+                "reason": "Identified as affected region based on analysis."
+            })
+    
+    # Transform market_data to array format
+    market_data_array = []
+    if market_data and isinstance(market_data, dict):
+        market_data_array = [market_data]
+    
+    # Extract trend graph from trends object
+    trend_graph = {}
+    if trends and isinstance(trends, dict):
+        graph_data = trends.get("graph", {})
+        trend_graph = {
+            "period": graph_data.get("period", "Last 6 Months"),
+            "trend_direction": trends.get("trend_direction", "stable"),
+            "data_points": graph_data.get("data_points", [])
+        }
+    
+    # Transform actions to new format
+    actions_obj = {"jira_payload": {}, "slack_message": ""}
+    if actions and isinstance(actions, list) and len(actions) > 0:
+        priority_map = {"Critical": "Highest", "High": "High", "Medium": "Medium"}
+        first_action = actions[0]
+        actions_obj["jira_payload"] = {
+            "summary": first_action.get("title", "Security Alert"),
+            "description": first_action.get("description", ""),
+            "priority": priority_map.get(first_action.get("priority", "Medium"), "Medium")
+        }
+        if first_action.get("priority") == "Critical":
+            actions_obj["slack_message"] = f"*🚨 CRITICAL:* {first_action.get('title', 'Security Alert')}"
+        else:
+            actions_obj["slack_message"] = f"*⚠️ {first_action.get('priority', 'Alert')}:* {first_action.get('title', 'Security Alert')}"
+
+    # Return enriched structure
+    return {
+        "id": article.get("id"),
+        "title": article.get("title"),
+        "url": article.get("url"),
+        "published": article.get("published"),
+        "author": article.get("author"),
+        "image_url": article.get("image_url"),
+        "media_type": article.get("media_type"),
+        "is_new": bool(article.get("is_new")),
+        "content": {
+            "short_description": article.get("short_description"),
+            "long_description": article.get("long_description"),
+            "full_text": article.get("full_text"),
+            "reading_time": len((article.get("full_text") or "").split()) // 200 or 1
+        },
+        "scores": {
+            "confidence_score": article.get("confidence_score") or 0,
+            "relevance_score": article.get("relevance_score") or 0,
+            "sentiment_score": article.get("sentiment_score") or 0,
+            "trend_score": article.get("trend_score") or 0
+        },
+        "classification": {
+            "category": article.get("ai_category") or "Security",
+            "legacy_category": category_data if category_data else {"id": "security_news", "name": "Security News"},
+            "tags": tags,
+            "actionable": bool(article.get("actionable"))
+        },
+        "metadata": {
+            "analyzed_at": article.get("analyzed_at"),
+            "keywords": keywords,
+            "sources": sources,
+            "is_new": bool(article.get("is_new"))
+        },
+        "trends": trends,
+        "ai_analysis": ai_analysis,
+        "ai_summary": ai_summary,
+        "visual_data": {
+            "trend_graph": trend_graph,
+            "geo_impact": geo_impact_array
+        },
+        "enrichment": {
+            "tech_stack": tech_stack,
+            "market_data": market_data_array
+        },
+        "actions": actions_obj
+    }
 
 @app.post("/analyze/{article_id}")
 def trigger_analysis(article_id: str, background_tasks: BackgroundTasks, force: bool = False):

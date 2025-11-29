@@ -8,6 +8,7 @@ import {
   ChevronRight,
   SlidersHorizontal,
   Sparkles,
+  TrendingUp,
 } from "lucide-react";
 import ArticleCard from "../components/ArticleCard";
 import { useFilteredArticles } from "@/hooks/useArticles";
@@ -31,7 +32,7 @@ export default function ExplorePage() {
   const [activeTag, setActiveTag] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
 
-  const { articles, loading, error } = useFilteredArticles(
+  const { articles, loading, error, trendingKeywords } = useFilteredArticles(
     activeTag === "all" ? "All" : activeTag,
     searchQuery
   );
@@ -146,6 +147,30 @@ export default function ExplorePage() {
               </button>
             )}
           </div>
+
+          {/* Trending Keywords */}
+          {trendingKeywords && trendingKeywords.length > 0 && (
+            <div className="mb-6 bg-white rounded-xl border border-gray-200 p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <TrendingUp className="w-4 h-4 text-violet-600" />
+                <h3 className="text-sm font-bold text-slate-900">Trending Keywords</h3>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {trendingKeywords.slice(0, 15).map((item, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => handleSearch(item.keyword)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-violet-50 text-violet-700 rounded-lg text-xs font-medium hover:bg-violet-100 transition-colors border border-violet-100"
+                  >
+                    <span>{item.keyword}</span>
+                    <span className="bg-violet-200 text-violet-800 px-1.5 py-0.5 rounded-full text-[10px] font-bold">
+                      {item.count}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Results Count */}
           <div className="flex items-center justify-between mb-6">

@@ -49,7 +49,7 @@ export function useFilteredArticles(
     const { articlesData, loading, error } = useArticles();
     const [filteredArticles, setFilteredArticles] = useState<DisplayArticle[]>([]);
     const [categories, setCategories] = useState<string[]>(['All']);
-    const [trendingKeywords, setTrendingKeywords] = useState<Array<{ tag: string; count: number }>>([]);
+    const [trendingKeywords, setTrendingKeywords] = useState<Array<{ tag: string; count: number; keyword: string }>>([]);
 
     useEffect(() => {
         if (!articlesData) return;
@@ -79,6 +79,19 @@ export function useFilteredArticles(
 
         // Apply search filter
         articles = filterBySearch(articles, searchQuery);
+
+        // Sort by confidence score (highest first), then by published date (latest first)
+        articles.sort((a, b) => {
+            const aConfidence = a.scores?.confidence_score || 0;
+            const bConfidence = b.scores?.confidence_score || 0;
+            if (bConfidence !== aConfidence) {
+                return bConfidence - aConfidence; // Higher confidence first
+            }
+            // If confidence is equal, sort by published date (latest first)
+            const aDate = new Date(a.published || 0).getTime();
+            const bDate = new Date(b.published || 0).getTime();
+            return bDate - aDate;
+        });
 
         // Transform to display articles
         const displayArticles = articles.map(transformToDisplayArticle);
