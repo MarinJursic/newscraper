@@ -170,11 +170,7 @@ const ArticleDetail = () => {
     };
 
     return (
-        <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-violet-100 selection:text-violet-900 lg:grid lg:grid-cols-[260px_1fr]">
-            <div className="hidden lg:block">
-                <SidebarComponent isMobileMenuOpen={isMobileMenuOpen} setIsMobileMenuOpen={setIsMobileMenuOpen} />
-            </div>
-
+        <div>
             <div className="flex h-screen overflow-hidden">
                 <div className="flex-1 overflow-y-auto" onMouseUp={handleMouseUp}>
                     <div className="border-b border-gray-200 bg-white sticky top-0 z-20 px-8 lg:px-12 py-4">
