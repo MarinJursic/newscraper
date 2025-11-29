@@ -16,6 +16,8 @@ interface GeoLocation {
 
 interface ExpandableGeoMapProps {
     locations?: GeoLocation[];
+    selectedLocation?: string | null;
+    onLocationSelect?: (isoCode: string | null) => void;
 }
 
 // ISO code to country name mapping for amCharts
@@ -60,7 +62,7 @@ const ISO_TO_COUNTRY_NAME: Record<string, string> = {
     'EU': 'European Union',
 };
 
-const ExpandableGeoMap: React.FC<ExpandableGeoMapProps> = ({ locations = [] }) => {
+const ExpandableGeoMap: React.FC<ExpandableGeoMapProps> = ({ locations = [], selectedLocation, onLocationSelect }) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const chartRef = useRef<HTMLDivElement>(null);
     const rootRef = useRef<am5.Root | null>(null);
@@ -115,12 +117,25 @@ const ExpandableGeoMap: React.FC<ExpandableGeoMapProps> = ({ locations = [] }) =
             tooltipText: "{name}",
             toggleKey: "active",
             interactive: true,
+            cursorOverStyle: "pointer",
         });
 
-        // Set colors based on severity
+        // Set colors based on severity and selection
         polygonSeries.mapPolygons.template.adapters.add("fill", (fill, target) => {
-            const dataContext = target.dataItem?.dataContext as { name?: string };
+            const dataContext = target.dataItem?.dataContext as { name?: string; id?: string };
             const countryName = dataContext?.name;
+            const countryId = dataContext?.id;
+            
+            // Check if this country is selected
+            const isSelected = selectedLocation && locations.find(loc => {
+                const locCountryName = ISO_TO_COUNTRY_NAME[loc.iso_code] || loc.country_name;
+                return locCountryName === countryName && loc.iso_code === selectedLocation;
+            });
+            
+            if (isSelected) {
+                return am5.color("#3B82F6"); // Blue for selected
+            }
+            
             const severity = countrySeverities[countryName || ""] ?? 0;
             return severity > 0
                 ? severityColors[Math.min(severity, 5) as keyof typeof severityColors] || am5.color("#D6D6DA")
@@ -128,11 +143,11 @@ const ExpandableGeoMap: React.FC<ExpandableGeoMapProps> = ({ locations = [] }) =
         });
 
         polygonSeries.mapPolygons.template.states.create("hover", {
-            fill: am5.color("#CCC"),
+            fill: am5.color("#60A5FA"),
         });
 
         polygonSeries.mapPolygons.template.states.create("active", {
-            fill: root.interfaceColors.get("primaryButtonHover"),
+            fill: am5.color("#3B82F6"),
         });
 
         let previousPolygon: am5map.MapPolygon | undefined;
@@ -144,14 +159,75 @@ const ExpandableGeoMap: React.FC<ExpandableGeoMapProps> = ({ locations = [] }) =
                 previousPolygon.set("active", false);
             }
             if (target.get("active")) {
+                const dataContext = target.dataItem?.dataContext as { name?: string };
+                const countryName = dataContext?.name;
+                
+                // Find the matching location by country name
+                const matchingLocation = locations.find(loc => {
+                    const locCountryName = ISO_TO_COUNTRY_NAME[loc.iso_code] || loc.country_name;
+                    return locCountryName === countryName;
+                });
+                
+                if (matchingLocation && onLocationSelect) {
+                    onLocationSelect(matchingLocation.iso_code);
+                }
+                
                 polygonSeries.zoomToDataItem(
                     target.dataItem as am5.DataItem<am5map.IMapPolygonSeriesDataItem>
                 );
             } else {
+                if (onLocationSelect) {
+                    onLocationSelect(null);
+                }
                 chart.goHome();
             }
             previousPolygon = target;
         });
+        
+        // Sync with external selection - use a timeout to ensure map is fully rendered
+        const syncSelection = () => {
+            if (selectedLocation) {
+                const matchingLocation = locations.find(loc => loc.iso_code === selectedLocation);
+                if (matchingLocation) {
+                    const countryName = ISO_TO_COUNTRY_NAME[matchingLocation.iso_code] || matchingLocation.country_name;
+                    polygonSeries.dataItems.each((dataItem) => {
+                        const dataContext = dataItem.dataContext as { name?: string };
+                        if (dataContext?.name === countryName) {
+                            const polygon = dataItem.get("mapPolygon") as am5map.MapPolygon;
+                            if (polygon) {
+                                if (!polygon.get("active")) {
+                                    polygon.set("active", true);
+                                }
+                                polygonSeries.zoomToDataItem(dataItem);
+                            }
+                        } else {
+                            // Deselect other polygons
+                            const polygon = dataItem.get("mapPolygon") as am5map.MapPolygon;
+                            if (polygon && polygon.get("active")) {
+                                polygon.set("active", false);
+                            }
+                        }
+                    });
+                }
+            } else {
+                // Deselect all if no location is selected
+                polygonSeries.dataItems.each((dataItem) => {
+                    const polygon = dataItem.get("mapPolygon") as am5map.MapPolygon;
+                    if (polygon && polygon.get("active")) {
+                        polygon.set("active", false);
+                    }
+                });
+                chart.goHome();
+            }
+        };
+        
+        // Sync selection after map is rendered
+        setTimeout(syncSelection, 200);
+        
+        // Also sync when selectedLocation changes
+        if (selectedLocation !== undefined) {
+            syncSelection();
+        }
 
         // Add zoom control
         chart.set("zoomControl", am5map.ZoomControl.new(root, {}));
@@ -170,7 +246,7 @@ const ExpandableGeoMap: React.FC<ExpandableGeoMapProps> = ({ locations = [] }) =
         return () => {
             root.dispose();
         };
-    }, [isExpanded, locations]);
+    }, [isExpanded, locations, selectedLocation, onLocationSelect]);
 
     if (!locations || locations.length === 0) {
         return null;
@@ -233,25 +309,31 @@ const ExpandableGeoMap: React.FC<ExpandableGeoMapProps> = ({ locations = [] }) =
                         <div className="mt-4 pt-4 border-t border-gray-200">
                             <h4 className="text-sm font-bold text-slate-900 mb-3">Affected Regions</h4>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                                {locations.map((loc, idx) => (
-                                    <div
-                                        key={idx}
-                                        className="flex items-center justify-between p-2 bg-slate-50 rounded-lg text-xs"
-                                    >
-                                        <span className="font-medium text-slate-700">{loc.country_name}</span>
-                                        <div className="flex items-center gap-2">
-                                            <span className={`px-2 py-0.5 rounded text-[10px] font-medium ${
-                                                loc.severity >= 3 
-                                                    ? 'bg-red-100 text-red-700' 
-                                                    : loc.severity >= 2 
-                                                        ? 'bg-orange-100 text-orange-700' 
-                                                        : 'bg-yellow-100 text-yellow-700'
-                                            }`}>
-                                                Severity {loc.severity}
-                                            </span>
+                                {locations.map((loc, idx) => {
+                                    const isSelected = selectedLocation === loc.iso_code;
+                                    return (
+                                        <div
+                                            key={idx}
+                                            className={`flex items-center justify-between p-2 rounded-lg text-xs cursor-pointer transition-colors ${
+                                                isSelected ? 'bg-blue-50 border border-blue-200' : 'bg-slate-50 hover:bg-slate-100'
+                                            }`}
+                                            onClick={() => onLocationSelect?.(isSelected ? null : loc.iso_code)}
+                                        >
+                                            <span className={`font-medium ${isSelected ? 'text-blue-700' : 'text-slate-700'}`}>{loc.country_name}</span>
+                                            <div className="flex items-center gap-2">
+                                                <span className={`px-2 py-0.5 rounded text-[10px] font-medium ${
+                                                    loc.severity >= 3 
+                                                        ? 'bg-red-100 text-red-700' 
+                                                        : loc.severity >= 2 
+                                                            ? 'bg-orange-100 text-orange-700' 
+                                                            : 'bg-yellow-100 text-yellow-700'
+                                                }`}>
+                                                    Severity {loc.severity}
+                                                </span>
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         </div>
                     </div>

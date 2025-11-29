@@ -1,5 +1,5 @@
 // app/dashboard/layout.tsx
-import Sidebar from "./components/Sidebar";
+import Sidebar from "@/components/Sidebar";
 import AuthGuard from "@/components/AuthGuard";
 
 export default function DashboardLayout({
