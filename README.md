@@ -7,15 +7,11 @@ AI-powered news summarization platform for global tax and regulatory updates. Au
 ## Visuals
 
 <p align="center">
-  <img width="90%" src="https://github.com/user-attachments/assets/5567a6ee-1c9c-40cb-86eb-58b94e010ed5" alt="Blinkfeed - Home page"/>
+  <img width="90%" src="https://github.com/user-attachments/assets/328ba4a7-6044-422d-aac7-06159ccd6589" alt="Blinkfeed - Home page"/>
   
-  <img width="45%" src="https://github.com/user-attachments/assets/5f87935e-f803-4c8e-813a-82c1513d911d" alt="Blinkfeed - For you"/>
+  <img width="45%" src="https://github.com/user-attachments/assets/ed2e6d7d-43af-4c0f-97f9-ffb0063faf49" alt="Blinkfeed - For you"/>
   
-  <img width="45%" src="https://github.com/user-attachments/assets/c9e460f0-f880-44ea-ade7-95627118434f" alt="Blinkfeed - Explore"/>
-
-  <img width="45%" src="https://github.com/user-attachments/assets/c9e460f0-f880-44ea-ade7-95627118434f" alt="Blinkfeed - Article details 1"/>
-
-  <img width="45%" src="https://github.com/user-attachments/assets/c9e460f0-f880-44ea-ade7-95627118434f" alt="Blinkfeed - Article details 2"/>
+  <img width="45%" src="https://github.com/user-attachments/assets/152ca429-0167-421a-8fd3-fd01b7fb55eb" alt="Blinkfeed - Explore"/>
 </p>
 
 ## Attribution
