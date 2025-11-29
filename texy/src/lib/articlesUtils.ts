@@ -16,7 +16,7 @@ export async function fetchArticles(params?: {
             offset: params?.offset || 0,
             category: params?.category && params.category !== 'All' ? params.category : undefined,
             search: params?.search,
-            sort: 'published',
+            sort: 'confidence_score',
             order: 'desc'
         });
 
@@ -56,17 +56,30 @@ export function transformToDisplayArticle(article: Article): DisplayArticle {
     // Extract source from author or first source in metadata
     const source = article.author || article.metadata?.sources?.[0]?.domain || 'Unknown';
 
+    // Clean published date - remove any weird characters at the start
+    let cleanedPublished = article.published || '';
+    // Remove any non-printable characters, zero-width characters, or special characters at the start
+    cleanedPublished = cleanedPublished
+        .replace(/^[\u200B-\u200D\uFEFF\u00A0\u2000-\u200A\u202F\u205F\u3000\u0080-\u009F]+/, '') // Remove zero-width and control chars
+        .replace(/^[^\w\s]+/, '') // Remove any non-word, non-space characters at start
+        .trim();
+
     return {
         id: article.id,
         category: article.classification?.category || 'Security',
         source: source,
-        time: article.published,
+        time: cleanedPublished,
         title: article.title,
         summary: article.content?.short_description || '',
         sentiment: sentiment,
         image: article.image_url,
         tags: article.classification?.tags || [],
         trendScore: article.scores?.trend_score ?? 0,
+        actionable: article.classification?.actionable ?? false,
+        confidenceScore: article.scores?.confidence_score ?? 0,
+        relevanceScore: article.scores?.relevance_score ?? 0,
+        trendDirection: article.trends?.trend_direction || 'stable',
+        changePercent: article.trends?.change_percent || 0,
     };
 }
 
@@ -142,23 +155,31 @@ export function getCuratedArticles(articles: Article[], limit: number = 10): Art
 }
 
 /**
- * Extracts trending keywords from articles
+ * Extracts trending keywords from articles with usage counts
  */
-export function extractTrendingKeywords(articles: Article[], limit: number = 6): Array<{ tag: string; count: number }> {
+export function extractTrendingKeywords(articles: Article[], limit: number = 20): Array<{ tag: string; count: number; keyword: string }> {
     const keywordMap = new Map<string, number>();
 
     articles.forEach(article => {
         const keywords = article.metadata?.keywords || [];
         keywords.forEach((kw: any) => {
-            if ((kw.score ?? 0) >= 50) { // Only high-score keywords
-                const current = keywordMap.get(kw.keyword) || 0;
-                keywordMap.set(kw.keyword, current + 1);
+            // Count all keywords, but prioritize high-score ones
+            const keyword = typeof kw === 'string' ? kw : kw.keyword;
+            if (keyword) {
+                const current = keywordMap.get(keyword) || 0;
+                // Weight by score if available
+                const weight = typeof kw === 'object' && kw.score ? (kw.score >= 50 ? 2 : 1) : 1;
+                keywordMap.set(keyword, current + weight);
             }
         });
     });
 
     return Array.from(keywordMap.entries())
-        .map(([tag, count]) => ({ tag: `#${tag.replace(/\s+/g, '')}`, count }))
+        .map(([keyword, count]) => ({ 
+            tag: `#${keyword.replace(/\s+/g, '')}`, 
+            keyword: keyword,
+            count 
+        }))
         .sort((a, b) => b.count - a.count)
         .slice(0, limit);
 }

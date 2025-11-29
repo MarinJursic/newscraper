@@ -4,7 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import {
   Home,
-  Globe,
   Bookmark,
   ChevronDown,
   Folder,
@@ -82,17 +81,6 @@ const Sidebar = () => {
             >
               <Hash className="w-5 h-5" />
               Explore
-            </Link>
-            <Link
-              href="/dashboard/world-map"
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium transition-colors ${
-                isActive("/dashboard/world-map")
-                  ? "bg-slate-100 text-slate-900"
-                  : "text-slate-500 hover:bg-gray-50 hover:text-slate-900"
-              }`}
-            >
-              <Globe className="w-5 h-5" />
-              Impact Map
             </Link>
 
             <Separator className="my-2" />

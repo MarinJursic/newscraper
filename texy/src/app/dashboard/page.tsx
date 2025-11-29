@@ -3,6 +3,7 @@
 import { useState } from "react";
 import HeroSection from "./components/HeroSection";
 import TrendingWidget from "./components/TrendingWidget";
+import { TrendingTopicsWidget } from "@/components/features/trending-topics-widget/TrendingTopicsWidget";
 import { useFilteredArticles } from "../../hooks/useArticles";
 import ArticlesStore from "./components/ArticlesStore";
 
@@ -74,6 +75,9 @@ const Dashboard = () => {
                 keywords={trendingKeywords}
                 totalArticles={statistics.total_articles}
               />
+            )}
+            {trendingKeywords && (
+              <TrendingTopicsWidget keywords={trendingKeywords} />
             )}
           </div>
         </div>

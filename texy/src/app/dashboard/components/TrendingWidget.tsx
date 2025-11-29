@@ -5,6 +5,7 @@ import { Activity } from 'lucide-react';
 type Keyword = {
     tag: string;
     count: number;
+    keyword?: string;
 }
 
 const TrendingWidget = ({ keywords, totalArticles }: { keywords: Keyword[], totalArticles: number }) => {
@@ -21,9 +22,11 @@ const TrendingWidget = ({ keywords, totalArticles }: { keywords: Keyword[], tota
             <div className="space-y-1">
                 {keywords.map((item) => (
                     <div key={item.tag} className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 group cursor-pointer transition-colors">
-                        <span className="text-sm font-medium text-slate-700 group-hover:text-violet-700 transition-colors">{item.tag}</span>
-                        <span className="text-[10px] font-medium text-slate-400 bg-gray-100 px-2 py-0.5 rounded-full group-hover:bg-white group-hover:shadow-sm transition-all">
-                            {item.count} posts
+                        <span className="text-sm font-medium text-slate-700 group-hover:text-violet-700 transition-colors">
+                            {item.keyword || item.tag.replace('#', '')}
+                        </span>
+                        <span className="text-[10px] font-bold text-violet-600 bg-violet-50 px-2 py-0.5 rounded-full group-hover:bg-violet-100 group-hover:shadow-sm transition-all">
+                            {item.count}
                         </span>
                     </div>
                 ))}
