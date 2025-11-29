@@ -7,12 +7,12 @@ import WorldMap from "@/components/WorldMap";
 const MapCard: React.FC = () => {
   return (
     <Card className="w-full max-w-sm gap-2">
-      <CardHeader className="">
+      <CardHeader>
         <CardTitle className="text-lg">Impact Map</CardTitle>
       </CardHeader>
 
       <CardContent>
-        <WorldMap height="400px" />
+        <WorldMap height="400px" showFullScreen={true} />
       </CardContent>
     </Card>
   );

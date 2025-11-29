@@ -1,17 +1,25 @@
 "use client";
 
-import React, { useLayoutEffect, useRef } from "react";
+import React, { useLayoutEffect, useRef, useState } from "react";
 import * as am5 from "@amcharts/amcharts5";
 import * as am5map from "@amcharts/amcharts5/map";
 import am5geodata_worldLow from "@amcharts/amcharts5-geodata/worldLow";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Maximize } from "lucide-react";
 
 interface WorldMapProps {
   height: string;
+  showFullScreen?: boolean;
 }
 
-const WorldMap: React.FC<WorldMapProps> = ({ height }) => {
+const WorldMap: React.FC<WorldMapProps> = ({
+  height,
+  showFullScreen = false,
+}) => {
   const chartRef = useRef<HTMLDivElement>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useLayoutEffect(() => {
     if (!chartRef.current) return;
@@ -115,11 +123,30 @@ const WorldMap: React.FC<WorldMapProps> = ({ height }) => {
   }, []);
 
   return (
-    <div
-      ref={chartRef}
-      style={{ width: "100%", height }}
-      className="border rounded"
-    ></div>
+    <div className="relative">
+      <div
+        ref={chartRef}
+        style={{ width: "100%", height }}
+        className="border rounded"
+      ></div>
+
+      {showFullScreen && (
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              className="absolute top-2 right-2 z-10 bg-background/80 backdrop-blur-sm"
+            >
+              <Maximize className="h-4 w-4" />
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-auto sm:max-w-auto w-[80dvw] h-[80dvh] p-0">
+            <WorldMap height="100%" showFullScreen={false} />
+          </DialogContent>
+        </Dialog>
+      )}
+    </div>
   );
 };
 
