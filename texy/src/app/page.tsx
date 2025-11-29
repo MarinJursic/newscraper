@@ -1,19 +1,19 @@
 "use client";
 
-import {
-  Play,
-  FileText,
-  Headphones,
-  Globe,
-  ArrowRight,
-  Shield,
-  Activity,
-  CheckCircle,
-} from "lucide-react";
-import { useRouter } from "next/navigation";
+import { Play, FileText, Headphones, Globe, ArrowRight, Shield, Activity, CheckCircle } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useAuthStore } from '@/store/authStore';
+import { useEffect } from 'react';
 
 export default function Home() {
   const router = useRouter();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push('/dashboard');
+    }
+  }, [isAuthenticated, router]);
 
   return (
     <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-violet-100 selection:text-violet-900">
