@@ -1,16 +1,39 @@
 import { Article, ArticlesData, DisplayArticle } from '@/types/articles';
+import { getArticles, getCategories as getAPICategories } from '@/lib/api';
 
 /**
- * Fetches articles data from the public folder
+ * Fetches articles data from the backend API
  */
-export async function fetchArticles(): Promise<ArticlesData> {
+export async function fetchArticles(params?: {
+    limit?: number;
+    offset?: number;
+    category?: string;
+    search?: string;
+}): Promise<ArticlesData> {
     try {
-        const response = await fetch('/articles.json');
-        if (!response.ok) {
-            throw new Error('Failed to fetch articles');
-        }
-        const data: ArticlesData = await response.json();
-        return data;
+        const response = await getArticles({
+            limit: params?.limit || 100,
+            offset: params?.offset || 0,
+            category: params?.category && params.category !== 'All' ? params.category : undefined,
+            search: params?.search,
+            sort: 'published',
+            order: 'desc'
+        });
+
+        // Fetch categories from API
+        const categories = await getAPICategories();
+
+        return {
+            metadata: {
+                generated_at: new Date().toISOString(),
+                total_articles: response.pagination.total,
+                version: '3.1',
+                avg_confidence: 0,
+                avg_relevance: 0
+            },
+            articles: response.articles as Article[],
+            categories_available: categories.map(c => c.name)
+        };
     } catch (error) {
         console.error('Error fetching articles:', error);
         throw error;
@@ -23,26 +46,27 @@ export async function fetchArticles(): Promise<ArticlesData> {
 export function transformToDisplayArticle(article: Article): DisplayArticle {
     // Determine sentiment based on sentiment_score
     let sentiment: 'positive' | 'neutral' | 'critical' = 'neutral';
-    if (article.scores.sentiment_score < -50) {
+    const sentimentScore = article.scores?.sentiment_score ?? 0;
+    if (sentimentScore < -50) {
         sentiment = 'critical';
-    } else if (article.scores.sentiment_score > 20) {
+    } else if (sentimentScore > 20) {
         sentiment = 'positive';
     }
 
     // Extract source from author or first source in metadata
-    const source = article.author || article.metadata.sources[0]?.domain || 'Unknown';
+    const source = article.author || article.metadata?.sources?.[0]?.domain || 'Unknown';
 
     return {
         id: article.id,
-        category: article.classification.category,
+        category: article.classification?.category || 'Security',
         source: source,
         time: article.published,
         title: article.title,
-        summary: article.content.short_description,
+        summary: article.content?.short_description || '',
         sentiment: sentiment,
         image: article.image_url,
-        tags: article.classification.tags,
-        trendScore: article.scores.trend_score,
+        tags: article.classification?.tags || [],
+        trendScore: article.scores?.trend_score ?? 0,
     };
 }
 
@@ -51,7 +75,7 @@ export function transformToDisplayArticle(article: Article): DisplayArticle {
  */
 export function filterByCategory(articles: Article[], category: string): Article[] {
     if (category === 'All') return articles;
-    return articles.filter(article => article.classification.category === category);
+    return articles.filter(article => article.classification?.category === category);
 }
 
 /**
@@ -61,9 +85,9 @@ export function filterBySearch(articles: Article[], query: string): Article[] {
     if (!query) return articles;
     const lowerQuery = query.toLowerCase();
     return articles.filter(article =>
-        article.title.toLowerCase().includes(lowerQuery) ||
-        article.content.short_description.toLowerCase().includes(lowerQuery) ||
-        article.classification.tags.some(tag => tag.toLowerCase().includes(lowerQuery))
+        article.title?.toLowerCase().includes(lowerQuery) ||
+        article.content?.short_description?.toLowerCase().includes(lowerQuery) ||
+        article.classification?.tags?.some(tag => tag.toLowerCase().includes(lowerQuery))
     );
 }
 
@@ -71,7 +95,7 @@ export function filterBySearch(articles: Article[], query: string): Article[] {
  * Sorts articles by trend score (descending)
  */
 export function sortByTrending(articles: Article[]): Article[] {
-    return [...articles].sort((a, b) => b.scores.trend_score - a.scores.trend_score);
+    return [...articles].sort((a, b) => (b.scores?.trend_score ?? 0) - (a.scores?.trend_score ?? 0));
 }
 
 /**
@@ -86,8 +110,11 @@ export function getTrendingArticles(articles: Article[], limit: number = 10): Ar
  */
 export function getHiddenGems(articles: Article[], limit: number = 10): Article[] {
     return [...articles]
-        .filter(article => article.scores.relevance_score > 80 && article.trends.virality.news_volume !== 'viral')
-        .sort((a, b) => b.scores.relevance_score - a.scores.relevance_score)
+        .filter(article =>
+            (article.scores?.relevance_score ?? 0) > 80 &&
+            article.trends?.virality?.news_volume !== 'viral'
+        )
+        .sort((a, b) => (b.scores?.relevance_score ?? 0) - (a.scores?.relevance_score ?? 0))
         .slice(0, limit);
 }
 
@@ -96,8 +123,11 @@ export function getHiddenGems(articles: Article[], limit: number = 10): Article[
  */
 export function getRisingStars(articles: Article[], limit: number = 10): Article[] {
     return [...articles]
-        .filter(article => article.trends.trend_direction === 'rising' || article.trends.change_percent > 50)
-        .sort((a, b) => b.trends.change_percent - a.trends.change_percent)
+        .filter(article =>
+            article.trends?.trend_direction === 'rising' ||
+            (article.trends?.change_percent ?? 0) > 50
+        )
+        .sort((a, b) => (b.trends?.change_percent ?? 0) - (a.trends?.change_percent ?? 0))
         .slice(0, limit);
 }
 
@@ -106,8 +136,8 @@ export function getRisingStars(articles: Article[], limit: number = 10): Article
  */
 export function getCuratedArticles(articles: Article[], limit: number = 10): Article[] {
     return [...articles]
-        .filter(article => article.classification.actionable)
-        .sort((a, b) => b.scores.confidence_score - a.scores.confidence_score)
+        .filter(article => article.classification?.actionable)
+        .sort((a, b) => (b.scores?.confidence_score ?? 0) - (a.scores?.confidence_score ?? 0))
         .slice(0, limit);
 }
 
@@ -118,8 +148,9 @@ export function extractTrendingKeywords(articles: Article[], limit: number = 6):
     const keywordMap = new Map<string, number>();
 
     articles.forEach(article => {
-        article.metadata.keywords.forEach(kw => {
-            if (kw.score >= 50) { // Only high-score keywords
+        const keywords = article.metadata?.keywords || [];
+        keywords.forEach((kw: any) => {
+            if ((kw.score ?? 0) >= 50) { // Only high-score keywords
                 const current = keywordMap.get(kw.keyword) || 0;
                 keywordMap.set(kw.keyword, current + 1);
             }

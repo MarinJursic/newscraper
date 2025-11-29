@@ -2,7 +2,7 @@ import sqlite3
 import json
 import os
 import time
-from fastapi import FastAPI, BackgroundTasks, HTTPException
+from fastapi import FastAPI, BackgroundTasks, HTTPException, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from datetime import datetime
@@ -135,17 +135,50 @@ def get_articles(
     params.extend([limit, offset])
     
     c.execute(query, params)
-    articles = [dict(row) for row in c.fetchall()]
-    
-    # Parse JSON fields (minimal for list view)
-    for article in articles:
-        for field in ["tags_json", "keywords_json", "category"]:
-            if article.get(field):
-                try:
-                    if field.endswith("_json"):
-                        article[field.replace("_json", "")] = json.loads(article[field])
-                except:
-                    pass
+    raw_articles = [dict(row) for row in c.fetchall()]
+
+    # Transform articles to match frontend expected structure
+    articles = []
+    for article in raw_articles:
+        # Parse JSON fields
+        tags = json.loads(article.get("tags_json") or "[]")
+        keywords = json.loads(article.get("keywords_json") or "[]")
+        sources = json.loads(article.get("sources_json") or "[]")
+        trends = json.loads(article.get("trends_json") or "{}")
+
+        # Transform to nested structure
+        transformed = {
+            "id": article.get("id"),
+            "title": article.get("title"),
+            "url": article.get("url"),
+            "published": article.get("published"),
+            "author": article.get("author"),
+            "image_url": article.get("image_url"),
+            "content": {
+                "short_description": article.get("short_description"),
+                "long_description": article.get("long_description"),
+                "full_text": article.get("full_text"),
+                "reading_time": len((article.get("full_text") or "").split()) // 200 or 1
+            },
+            "scores": {
+                "confidence_score": article.get("confidence_score") or 0,
+                "relevance_score": article.get("relevance_score") or 0,
+                "sentiment_score": article.get("sentiment_score") or 0,
+                "trend_score": article.get("trend_score") or 0
+            },
+            "classification": {
+                "category": article.get("ai_category") or "Security",
+                "tags": tags,
+                "actionable": bool(article.get("actionable"))
+            },
+            "metadata": {
+                "analyzed_at": article.get("analyzed_at"),
+                "keywords": keywords,
+                "sources": sources
+            },
+            "trends": trends
+        }
+        articles.append(transformed)
     
     # Get total count for pagination
     count_query = f"SELECT COUNT(*) FROM articles WHERE analyzed_at IS NOT NULL"
@@ -317,10 +350,15 @@ def trigger_backfill(background_tasks: BackgroundTasks, count: int = 100):
 # --- NEWSLETTER SUBSCRIPTION ROUTES ---
 
 @app.post("/subscribe")
-def subscribe_to_newsletter(email: str, role: str, tech_stack: list[str]):
+def subscribe_to_newsletter(
+    background_tasks: BackgroundTasks,
+    email: str = Form(...),
+    role: str = Form(...),
+    tech_stack: list[str] = Form(...)
+):
     """
     Subscribe to daily newsletter.
-    
+
     Args:
         email: Subscriber email
         role: One of: frontend, backend, devops, mobile, cto/vp, product mgr, founder, security, data/ai
@@ -328,6 +366,7 @@ def subscribe_to_newsletter(email: str, role: str, tech_stack: list[str]):
     """
     import json
     from datetime import datetime
+    from email_service import send_welcome_newsletter
     
     # Validate role
     valid_roles = ["frontend", "backend", "devops", "mobile", "cto/vp", "product mgr", "founder", "security", "data/ai"]
@@ -346,21 +385,21 @@ def subscribe_to_newsletter(email: str, role: str, tech_stack: list[str]):
     # Check if already subscribed
     c.execute("SELECT email, active FROM subscribers WHERE email = ?", (email,))
     existing = c.fetchone()
-    
+
     if existing:
+        # Update existing subscription (whether active or not)
+        c.execute("""
+            UPDATE subscribers
+            SET active = 1, role = ?, tech_stack = ?, subscribed_at = ?
+            WHERE email = ?
+        """, (role.lower(), json.dumps([t.lower() for t in tech_stack]), datetime.now().isoformat(), email))
+        conn.commit()
+        conn.close()
+
         if existing["active"]:
-            conn.close()
-            raise HTTPException(status_code=400, detail="Email already subscribed")
+            return {"message": "Preferences updated successfully", "email": email, "role": role, "tech_stack": tech_stack}
         else:
-            # Reactivate subscription
-            c.execute("""
-                UPDATE subscribers 
-                SET active = 1, role = ?, tech_stack = ?, subscribed_at = ?
-                WHERE email = ?
-            """, (role.lower(), json.dumps([t.lower() for t in tech_stack]), datetime.now().isoformat(), email))
-            conn.commit()
-            conn.close()
-            return {"message": "Subscription reactivated", "email": email}
+            return {"message": "Subscription reactivated", "email": email, "role": role, "tech_stack": tech_stack}
     
     # New subscription
     try:
@@ -370,6 +409,10 @@ def subscribe_to_newsletter(email: str, role: str, tech_stack: list[str]):
         """, (email, role.lower(), json.dumps([t.lower() for t in tech_stack]), datetime.now().isoformat()))
         conn.commit()
         conn.close()
+
+        # Send welcome newsletter in background with 5 personalized articles
+        background_tasks.add_task(send_welcome_newsletter, email, role.lower(), [t.lower() for t in tech_stack])
+
         return {"message": "Successfully subscribed", "email": email, "role": role, "tech_stack": tech_stack}
     except Exception as e:
         conn.close()

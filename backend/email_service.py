@@ -196,6 +196,80 @@ def send_email(to_email: str, subject: str, html_content: str) -> bool:
         return False
 
 
+def send_welcome_newsletter(email: str, role: str, tech_stack: List[str]) -> bool:
+    """
+    Send welcome newsletter to new subscriber with 5 most relevant articles.
+
+    Args:
+        email: Subscriber email
+        role: Subscriber role
+        tech_stack: List of technologies
+
+    Returns:
+        True if email was sent successfully, False otherwise
+    """
+    conn = get_db_connection()
+    c = conn.cursor()
+
+    # Get top articles (most recent analyzed articles)
+    c.execute("""
+        SELECT * FROM articles
+        WHERE analyzed_at IS NOT NULL
+        ORDER BY relevance_score DESC, analyzed_at DESC
+        LIMIT 50
+    """)
+
+    db_articles = [dict(row) for row in c.fetchall()]
+    conn.close()
+
+    # Parse JSON fields for each article
+    articles = []
+    for article in db_articles:
+        parsed = {
+            "id": article.get("id"),
+            "title": article.get("title"),
+            "url": article.get("url"),
+            "content": {
+                "short_description": article.get("short_description"),
+                "long_description": article.get("long_description"),
+            },
+            "scores": {
+                "confidence_score": article.get("confidence_score"),
+                "relevance_score": article.get("relevance_score"),
+                "trend_score": article.get("trend_score"),
+            },
+            "classification": {
+                "category": article.get("ai_category"),
+                "actionable": bool(article.get("actionable")),
+                "tags": json.loads(article.get("tags_json")) if article.get("tags_json") else []
+            },
+            "metadata": {
+                "keywords": json.loads(article.get("keywords_json")) if article.get("keywords_json") else []
+            }
+        }
+        articles.append(parsed)
+
+    # Match articles to preferences and get top 5
+    matched = match_articles_to_preferences(role, tech_stack, articles)[:5]
+
+    if not matched:
+        print(f"⚠️ No matching articles found for {email}, sending anyway with generic articles")
+        matched = articles[:5]  # Send top 5 articles if no matches
+
+    # Create subscriber dict for email generation
+    subscriber = {
+        "email": email,
+        "role": role,
+        "tech_stack": json.dumps(tech_stack)
+    }
+
+    # Generate and send welcome email
+    html = generate_email_html(subscriber, matched)
+    subject = f"🎉 Welcome! Here are {len(matched)} articles picked just for you"
+
+    return send_email(email, subject, html)
+
+
 def send_daily_newsletter(days_back: int = 1) -> Dict[str, Any]:
     """
     Send daily newsletter to all active subscribers.
