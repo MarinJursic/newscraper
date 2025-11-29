@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useRef } from 'react';
-import { Bookmark, ExternalLink, Share2 } from 'lucide-react';
+import { Bookmark, ExternalLink, Share2, ThumbsUp, ThumbsDown, MessageSquare } from 'lucide-react';
 import SidebarComponent from '../../components/Sidebar';
 import GeoImpactWidget from '../../components/GeoImpactWidget';
 import KeywordsWidget from '../../components/KeywordsWidget';
@@ -9,6 +9,7 @@ import IntelligenceSidebar from '../../components/IntelligenceSidebar';
 import NoteInput from '../../components/NoteInput';
 import { useFilteredArticles } from '@/hooks/useArticles';
 import { usePathname } from 'next/navigation';
+import { TrendingCard } from '@/components/features/trending-card/TrendingCard';
 
 interface Highlight {
     id: string;
@@ -66,6 +67,9 @@ const ArticleDetail = () => {
     const [activeTab, setActiveTab] = useState<'chat' | 'notes'>('notes');
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [editingNote, setEditingNote] = useState('');
+    const [feedbackGiven, setFeedbackGiven] = useState<'positive' | 'negative' | null>(null);
+    const [showFeedbackInput, setShowFeedbackInput] = useState(false);
+    const [feedbackText, setFeedbackText] = useState('');
 
     const contentRef = useRef<HTMLDivElement>(null);
     const noteInputRef = useRef<HTMLInputElement>(null);
@@ -249,6 +253,99 @@ const ArticleDetail = () => {
                                     {renderTextWithHighlights(ARTICLE_CONTENT.conclusion)}
                                 </p>
                             </div>
+
+                            <TrendingCard
+                                title="Trend of the word Phishing • Declining"
+                                data={trendData}
+                                dataKey="value"
+                                color="orange"
+                                className="mx-auto mt-8"
+                            />
+
+                            {/* Feedback Dialog */}
+                            <div className="mt-8 p-6 rounded-2xl border border-gray-200 bg-white">
+                                <div className="text-center">
+                                    <h3 className="text-lg font-semibold text-slate-900 mb-2">
+                                        Was the article summarized to your liking?
+                                    </h3>
+                                    <p className="text-sm text-slate-500 mb-4">
+                                        Your feedback helps us improve our AI summaries
+                                    </p>
+
+                                    {!feedbackGiven ? (
+                                        <div className="flex items-center justify-center gap-3">
+                                            <button
+                                                onClick={() => setFeedbackGiven('positive')}
+                                                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-50 text-emerald-700 font-medium text-sm hover:bg-emerald-100 transition-colors"
+                                            >
+                                                <ThumbsUp className="w-4 h-4" />
+                                                Yes, it was helpful
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    setFeedbackGiven('negative');
+                                                    setShowFeedbackInput(true);
+                                                }}
+                                                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-red-50 text-red-700 font-medium text-sm hover:bg-red-100 transition-colors"
+                                            >
+                                                <ThumbsDown className="w-4 h-4" />
+                                                Could be better
+                                            </button>
+                                        </div>
+                                    ) : feedbackGiven === 'positive' ? (
+                                        <div className="flex flex-col items-center gap-3">
+                                            <div className="flex items-center gap-2 text-emerald-600">
+                                                <ThumbsUp className="w-5 h-5" />
+                                                <span className="font-medium">Thanks for your feedback!</span>
+                                            </div>
+                                            <button
+                                                onClick={() => setShowFeedbackInput(true)}
+                                                className="text-sm text-slate-500 hover:text-violet-600 transition-colors flex items-center gap-1"
+                                            >
+                                                <MessageSquare className="w-3.5 h-3.5" />
+                                                Add additional comments
+                                            </button>
+                                        </div>
+                                    ) : !showFeedbackInput ? (
+                                        <div className="flex items-center justify-center gap-2 text-slate-600">
+                                            <span className="font-medium">Thanks for your feedback!</span>
+                                        </div>
+                                    ) : null}
+
+                                    {showFeedbackInput && (
+                                        <div className="mt-4 space-y-3">
+                                            <textarea
+                                                value={feedbackText}
+                                                onChange={(e) => setFeedbackText(e.target.value)}
+                                                placeholder="Tell us how we can improve..."
+                                                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-300 resize-none"
+                                                rows={3}
+                                            />
+                                            <div className="flex justify-end gap-2">
+                                                <button
+                                                    onClick={() => setShowFeedbackInput(false)}
+                                                    className="px-4 py-2 text-sm text-slate-600 hover:text-slate-900 transition-colors"
+                                                >
+                                                    Cancel
+                                                </button>
+                                                <button
+                                                    onClick={() => {
+                                                        // Handle feedback submission here
+                                                        console.log('Feedback submitted:', { rating: feedbackGiven, comment: feedbackText });
+                                                        setShowFeedbackInput(false);
+                                                        setFeedbackText('');
+                                                    }}
+                                                    className="px-4 py-2 bg-slate-900 text-white text-sm font-medium rounded-lg hover:bg-slate-800 transition-colors"
+                                                >
+                                                    Submit
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            
                         </div>
                     </div>
                 </div>
@@ -279,3 +376,13 @@ const ArticleDetail = () => {
 };
 
 export default ArticleDetail;
+
+const trendData = [
+    { date: "2024-11-01", value: 120 },
+    { date: "2024-11-05", value: 185 },
+    { date: "2024-11-10", value: 220 },
+    { date: "2024-11-15", value: 310 },
+    { date: "2024-11-20", value: 275 },
+    { date: "2024-11-25", value: 420 },
+    { date: "2024-11-29", value: 380 },
+]
