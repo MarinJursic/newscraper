@@ -69,6 +69,20 @@ export interface Virality {
     news_volume: string;
 }
 
+export interface VisualData {
+    trend_graph: {
+        period: string;
+        trend_direction: string;
+        data_points: Array<{ label: string; value: number }>;
+    };
+    geo_impact: Array<{ iso_code: string; severity: number, country_name: string, reason: string }>;
+}
+
+export interface Enrichment {
+    tech_stack: string[];
+    market_data: Array<{ ticker: string; company_name: string; price: number; change_percent: number, logo_url: string }>;
+}
+
 export interface ArticleTrends {
     keyword: string;
     trend_score: number;
@@ -119,6 +133,8 @@ export interface Article {
     trends: ArticleTrends;
     ai_analysis: AIAnalysis;
     ai_summary: AISummary;
+    visual_data: VisualData;
+    enrichment: Enrichment;
 }
 
 export interface ArticlesData {

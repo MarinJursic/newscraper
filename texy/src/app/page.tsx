@@ -13,7 +13,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex-shrink-0 flex items-center">
-              <span className="text-2xl font-serif font-bold tracking-tight">Texy</span>
+              <span className="text-2xl font-serif font-bold tracking-tight">Blinkfeed</span>
             </div>
             <div className="hidden md:flex space-x-8 items-center">
               <a href="#features" className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Features</a>
@@ -38,7 +38,7 @@ export default function Home() {
         </h1>
 
         <p className="text-lg md:text-xl text-slate-600 mb-10 max-w-2xl leading-relaxed">
-          Texy filters the noise. Get AI-curated summaries, audio briefings, and developer-centric intelligence from The Hacker News in seconds.
+          Blinkfeed filters the noise. Get AI-curated summaries, audio briefings, and developer-centric intelligence from The Hacker News in seconds.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 mb-20">
@@ -66,7 +66,7 @@ export default function Home() {
               <div className="flex-1 flex justify-center">
                 <div className="bg-white border border-gray-200 rounded-md px-3 py-1 text-xs text-gray-400 flex items-center gap-2 w-64 justify-center">
                   <Shield className="w-3 h-3" />
-                  texy.ai/dashboard
+                  blinkfeed.ai/dashboard
                 </div>
               </div>
             </div>
@@ -145,7 +145,7 @@ export default function Home() {
               <div className="w-12 h-12 bg-violet-50 rounded-xl flex items-center justify-center mb-6 text-violet-600">
                 <Headphones className="w-6 h-6" />
               </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-3">Texy Audio</h3>
+              <h3 className="text-xl font-bold text-slate-900 mb-3">Blinkfeed Audio</h3>
               <p className="text-slate-600 leading-relaxed">
                 Transform your morning reading list into a studio-quality personal podcast. AI synthesizes your key topics into a coherent audio narrative, perfect for your commute.
               </p>
@@ -169,7 +169,7 @@ export default function Home() {
       <section id="how-it-works" className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-slate-900">How Texy Works</h2>
+            <h2 className="text-3xl font-bold text-slate-900">How Blinkfeed Works</h2>
           </div>
 
           <div className="relative">
@@ -228,7 +228,7 @@ export default function Home() {
       <footer className="py-12 bg-white border-t border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-2">
-            <span className="text-xl font-serif font-bold text-slate-900">Texy</span>
+            <span className="text-xl font-serif font-bold text-slate-900">Blinkfeed</span>
             <span className="text-slate-400 text-sm">© 2024</span>
           </div>
           <div className="flex gap-6 text-sm text-slate-500">

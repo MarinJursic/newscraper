@@ -189,7 +189,7 @@ const SavedArticlesPage = () => {
                         <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 -ml-2 text-slate-600">
                             <Menu className="w-6 h-6" />
                         </button>
-                        <span className="text-xl font-bold font-serif">Texy.</span>
+                        <span className="text-xl font-bold font-serif">Blinkfeed.</span>
                     </div>
 
                     <div className="flex items-center gap-2 overflow-x-auto no-scrollbar mask-linear-fade w-full">

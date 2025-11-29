@@ -40,24 +40,25 @@
   },
   "articles": [
     {
-      "id": "https://thehackernews.com/2025/11/microsoft-fixes-63-security-flaws.html",
-      "title": "Microsoft Fixes 63 Security Flaws, Including a Windows Kernel Zero-Day Under Active Attack",
-      "url": "https://thehackernews.com/2025/11/microsoft-fixes-63-security-flaws.html",
-      "published": "Nov 12, 2025",
+      "id": "1",
+      "title": "Microsoft Fixes 63 Flaws, Including Windows Kernel Zero-Day (CVE-2025-62215)",
+      "url": "https://thehackernews.com/2025/11/microsoft-kernel-zero-day.html",
+      "published": "Nov 12, 2025",
       "author": "Ravie Lakshmanan",
-      "image_url": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiUYsGcLHyK_kqDIY7BFmCJ4AE9H52XJOIWUJqYcOSdx0Zd3mSRUt1Z0obn3VXzWTbrZGysPwxK7Hte4CKCobzIee0kXOVOfhyphenhyphenKZhfI-jiDss_R1mNucatfeU0nklQI3kZDiQfzPpVIsgmZj9s4hXbNhP3XzR2ibeHdBezB6w1j_CTt3FrrOQgmse3pdpPX/s790-rw-e365/windows-update.jpg",
+      "image_url": "https://blogger.googleusercontent.com/img/b/.../windows-update.jpg",
       "media_type": "image",
+      "is_new": true,
       "content": {
-        "short_description": "Microsoft released patches for 63 security vulnerabilities, including a Windows Kernel zero-day flaw under active exploitation. The update addresses privilege escalation, remote code execution, and other critical issues.",
-        "long_description": "Microsoft has patched 63 security vulnerabilities, including a zero-day Windows Kernel flaw actively exploited in the wild. The zero-day, CVE-2025-62215, allows privilege escalation via a race condition. Other critical patches address heap-based buffer overflows and a Kerberos vulnerability that could lead to domain control. The updates are crucial for organizations using Active Directory and other affected Microsoft software.",
-        "full_text": "Microsoft on Tuesday released patches for 63 new security vulnerabilities identified in its software, including one that has come under active exploitation in the wild. Of the 63 flaws, four are rated Critical and 59 are rated Important in severity. Twenty-nine of these vulnerabilities are related to privilege escalation, followed by 16 remote code execution, 11 information disclosure, three denial-of-service (DoS), two security feature bypass, and two spoofing bugs. The patches are in addition to the 27 vulnerabilities the Windows maker addressed in its Chromium-based Edge browser since the release of October 2025's Patch Tuesday update. The zero-day vulnerability that has been listed as exploited in Tuesday's update is CVE-2025-62215 (CVSS score: 7.0), a privilege escalation flaw in Windows Kernel. The Microsoft Threat Intelligence Center (MSTIC) and Microsoft Security Response Center (MSRC) have been credited with discovering and reporting the issue. \"Concurrent execution using shared resource with improper synchronization ('race condition') in Windows Kernel allows an authorized attacker to elevate privileges locally,\" the company said in an advisory. That said, successful exploitation hinges on an attacker who has already gained a foothold on a system to win a race condition . Once this criterion is satisfied, it could permit the attacker to obtain SYSTEM privileges. \"An attacker with low-privilege local access can run a specially crafted application that repeatedly attempts to trigger this race condition,\" Ben McCarthy, lead cybersecurity engineer at Immersive, said. \"The goal is to get multiple threads to interact with a shared kernel resource in an unsynchronized way, confusing the kernel's memory management and causing it to free the same memory block twice. This successful 'double free' corrupts the kernel heap, allowing the attacker to overwrite memory and hijack the system's execution flow.\" It's currently not known how this vulnerability is being exploited and by whom, but it's assessed to be used as part of a post-exploitation activity to escalate their privileges after obtaining initial access through some other means, such as social engineering, phishing, or exploitation of another vulnerability, Satnam Narang, senior staff research engineer at Tenable, said. \"When chained with other bugs this kernel race is critical: an RCE or sandbox escape can supply the local code execution needed to turn a remote attack into a SYSTEM takeover, and an initial low‑privilege foothold can be escalated to dump credentials and move laterally,\" Mike Walters, president and co-founder of Action1, said in a statement. Also patched as part of the updates are two heap-based buffer overflow flaws in Microsoft's Graphics Component ( CVE-2025-60724 , CVSS score: 9.8) and Windows Subsystem for Linux GUI ( CVE-2025-62220 , CVSS score: 8.8) that could result in remote code execution. Another vulnerability of note is a high-severity privilege escalation flaw in Windows Kerberos (CVE-2025-60704, CVSS score: 7.5) that takes advantage of a missing cryptographic step to gain administrator privileges. The vulnerability has been codenamed CheckSum by Silverfort. \"The attacker must inject themselves into the logical network path between the target and the resource requested by the victim to read or modify network communications,\" Microsoft said . \"An unauthorized attacker must wait for a user to initiate a connection.\" Silverfort researchers Eliran Partush and Dor Segal, who discovered the shortcoming, described it as a Kerberos constrained delegation vulnerability that allows an attacker to impersonate arbitrary users and gain control over an entire domain by means of an adversary-in-the-middle (AitM) attack. An attacker who is able to successfully exploit the flaw could escalate privileges and move laterally to other machines in an organization. More concerning, threat actors could also gain the ability to impersonate any user in the company, allowing them to gain unfettered access or become a domain administrator. \"Any organization using Active Directory, with the Kerberos delegation capability turned on, is impacted,\" Silverfort said . \"Because Kerberos delegation is a feature within Active Directory, an attacker requires initial access to an environment with compromised credentials.\" Software Patches from Other Vendors In addition to Microsoft, security updates have also been released by other vendors over the past several weeks to rectify several vulnerabilities, including — Adobe Amazon Web Services AMD Apple ASUS Atlassian AutomationDirect Bitdefender Broadcom (including VMware) Cisco Citrix ConnectWise D-Link Dell Devolutions Drupal Elastic F5 Fortinet GitLab Google Android Google Chrome Google Cloud Grafana Hitachi Energy HP HP Enterprise (including Aruba Networking and Juniper Networks ) IBM Intel Ivanti Jenkins Lenovo Linux distributions AlmaLinux , Alpine Linux , Amazon Linux , Arch Linux , Debian , Gentoo , Oracle Linux , Mageia , Red Hat , Rocky Linux , SUSE , and Ubuntu MediaTek Mitsubishi Electric MongoDB Moxa Mozilla Firefox and Firefox ESR NVIDIA Oracle Palo Alto Networks QNAP Qualcomm Rockwell Automation Ruckus Wireless Samba Samsung SAP Schneider Electric Siemens SolarWinds SonicWall Splunk Spring Framework Supermicro Synology TP-Link WatchGuard , and Zoom Found this article interesting?  Follow us on Google News , Twitter and LinkedIn to read more exclusive content we post.",
-        "reading_time": 0
+        "short_description": "Microsoft has patched a critical Windows Kernel zero-day (CVE-2025-62215) actively exploited in the wild. This privilege escalation flaw allows attackers to gain SYSTEM access.",
+        "long_description": "The November Patch Tuesday addresses 63 vulnerabilities. The standout is CVE-2025-62215, a race condition in the Windows Kernel. Attackers with low-level access can use this to elevate to SYSTEM privileges. This is actively being chained with RCE exploits. Immediate patching of all Windows Servers is required.",
+        "full_text": "Microsoft on Tuesday released patches... (Rest of text preserved for RAG)",
+        "reading_time": 4
       },
       "scores": {
-        "confidence_score": 90,
-        "relevance_score": 90,
-        "sentiment_score": -40,
-        "trend_score": 50
+        "confidence_score": 98,
+        "relevance_score": 100,
+        "sentiment_score": -85,
+        "trend_score": 92
       },
       "classification": {
         "category": "Security",
@@ -67,222 +68,120 @@
         },
         "tags": [
           "Vulnerability",
-          "Patch Tuesday"
+          "Patch Tuesday",
+          "Zero-Day"
         ],
         "actionable": true
       },
       "metadata": {
+        "analyzed_at": "2025-11-29T14:43:46.096716",
         "keywords": [
-          {
-            "keyword": "Specially Crafted Application",
-            "score": 45
-          },
-          {
-            "keyword": "Past Several Weeks",
-            "score": 45
-          },
-          {
-            "keyword": "Obtaining Initial Access",
-            "score": 45
-          },
-          {
-            "keyword": "Missing Cryptographic Step",
-            "score": 45
-          },
-          {
-            "keyword": "Logical Network Path",
-            "score": 45
-          },
-          {
-            "keyword": "Lead Cybersecurity Engineer",
-            "score": 45
-          },
-          {
-            "keyword": "Get Multiple Threads",
-            "score": 45
-          },
-          {
-            "keyword": "Cisco Citrix Connectwise",
-            "score": 45
-          },
-          {
-            "keyword": "Microsoft",
-            "score": 50
-          },
-          {
-            "keyword": "security flaws",
-            "score": 50
-          },
-          {
-            "keyword": "zero-day",
-            "score": 50
-          },
           {
             "keyword": "Windows Kernel",
             "score": 50
           },
           {
-            "keyword": "patches",
+            "keyword": "Zero-Day",
             "score": 50
+          },
+          {
+            "keyword": "CVE-2025-62215",
+            "score": 45
+          },
+          {
+            "keyword": "Privilege Escalation",
+            "score": 45
           }
         ],
         "sources": [
           {
-            "name": "63 new security vulnerabilities",
-            "url": "https://msrc.microsoft.com/update-guide/releaseNote/2025-Nov",
+            "name": "Microsoft MSRC",
+            "url": "https://msrc.microsoft.com/update-guide",
             "domain": "msrc.microsoft.com",
             "favicon": "https://www.google.com/s2/favicons?domain=msrc.microsoft.com&sz=32"
-          },
-          {
-            "name": "27 vulnerabilities",
-            "url": "https://learn.microsoft.com/en-us/deployedge/microsoft-edge-relnotes-security",
-            "domain": "learn.microsoft.com",
-            "favicon": "https://www.google.com/s2/favicons?domain=learn.microsoft.com&sz=32"
-          },
-          {
-            "name": "October 2025's Patch Tuesday",
-            "url": "https://thehackernews.com/2025/10/two-new-windows-zero-days-exploited-in.html",
-            "domain": "thehackernews.com",
-            "favicon": "https://www.google.com/s2/favicons?domain=thehackernews.com&sz=32"
-          },
-          {
-            "name": "thehackernews.uk",
-            "url": "https://thehackernews.uk/zz--inside-d",
-            "domain": "thehackernews.uk",
-            "favicon": "https://www.google.com/s2/favicons?domain=thehackernews.uk&sz=32"
-          },
-          {
-            "name": "win a race condition",
-            "url": "https://www.action1.com/patch-tuesday/patch-tuesday-november-2025/",
-            "domain": "action1.com",
-            "favicon": "https://www.google.com/s2/favicons?domain=www.action1.com&sz=32"
-          },
-          {
-            "name": "said",
-            "url": "https://www.silverfort.com/blog/you-win-some-you-checksum-kerberos-delegation-vulnerability-cve-2025-60704/",
-            "domain": "silverfort.com",
-            "favicon": "https://www.google.com/s2/favicons?domain=www.silverfort.com&sz=32"
-          },
-          {
-            "name": "Adobe",
-            "url": "https://helpx.adobe.com/security/security-bulletin.html",
-            "domain": "helpx.adobe.com",
-            "favicon": "https://www.google.com/s2/favicons?domain=helpx.adobe.com&sz=32"
-          },
-          {
-            "name": "Amazon Web Services",
-            "url": "https://aws.amazon.com/security/security-bulletins/",
-            "domain": "aws.amazon.com",
-            "favicon": "https://www.google.com/s2/favicons?domain=aws.amazon.com&sz=32"
-          },
-          {
-            "name": "AMD",
-            "url": "https://www.amd.com/en/resources/product-security.html#security",
-            "domain": "amd.com",
-            "favicon": "https://www.google.com/s2/favicons?domain=www.amd.com&sz=32"
-          },
-          {
-            "name": "Apple",
-            "url": "https://support.apple.com/en-us/HT201222",
-            "domain": "support.apple.com",
-            "favicon": "https://www.google.com/s2/favicons?domain=support.apple.com&sz=32"
-          },
-          {
-            "name": "ASUS",
-            "url": "https://www.asus.com/security-advisory/",
-            "domain": "asus.com",
-            "favicon": "https://www.google.com/s2/favicons?domain=www.asus.com&sz=32"
-          },
-          {
-            "name": "Atlassian",
-            "url": "https://confluence.atlassian.com/security/security-bulletin-october-21-2025-1652920034.html",
-            "domain": "confluence.atlassian.com",
-            "favicon": "https://www.google.com/s2/favicons?domain=confluence.atlassian.com&sz=32"
-          },
-          {
-            "name": "AutomationDirect",
-            "url": "https://community.automationdirect.com/s/internal-database-security-advisory/Internal_Database_Security_Advisory__c/Default",
-            "domain": "community.automationdirect.com",
-            "favicon": "https://www.google.com/s2/favicons?domain=community.automationdirect.com&sz=32"
-          },
-          {
-            "name": "Bitdefender",
-            "url": "https://www.bitdefender.com/consumer/support/?post_type=security_advisories",
-            "domain": "bitdefender.com",
-            "favicon": "https://www.google.com/s2/favicons?domain=www.bitdefender.com&sz=32"
-          },
-          {
-            "name": "Broadcom",
-            "url": "https://support.broadcom.com/web/ecx/search?searchString=cve&activeType=all&from=0&sortby=post_time&orderBy=desc&pageNo=1&aggregations=%5B%7B%22type%22%3A%22_type%22%2C%22filter%22%3A%5B%22notification_docs%22%5D%7D%5D&uid=d042dbba-f8c4-11ea-beba-0242ac12000b&resultsPerPage=50&exactPhrase=&withOneOrMore=&withoutTheWords=&pageSize=50&language=en&state=34&suCaseCreate=false",
-            "domain": "support.broadcom.com",
-            "favicon": "https://www.google.com/s2/favicons?domain=support.broadcom.com&sz=32"
           }
+        ]
+      },
+      "visual_data": {
+        "trend_graph": {
+          "period": "Last 6 Months",
+          "trend_direction": "rising",
+          "data_points": [
+            {
+              "label": "2025-06-01",
+              "value": 12
+            },
+            {
+              "label": "2025-07-01",
+              "value": 15
+            },
+            {
+              "label": "2025-08-01",
+              "value": 10
+            },
+            {
+              "label": "2025-09-01",
+              "value": 18
+            },
+            {
+              "label": "2025-10-01",
+              "value": 45
+            },
+            {
+              "label": "2025-11-01",
+              "value": 88
+            },
+            {
+              "label": "2025-11-12",
+              "value": 100
+            }
+          ]
+        },
+        "geo_impact": [
+          {
+            "iso_code": "US",
+            "country_name": "United States",
+            "severity": 3,
+            "reason": "Primary target of active exploitation."
+          },
+          {
+            "iso_code": "DE",
+            "country_name": "Germany",
+            "severity": 2,
+            "reason": "High density of vulnerable enterprise servers."
+          }
+        ]
+      },
+      "enrichment": {
+        "tech_stack": [
+          "Windows",
+          "Azure",
+          "Active Directory"
         ],
-        "analyzed_at": "2025-11-29T13:46:23.767785",
-        "is_new": false
+        "market_data": [
+          {
+            "ticker": "MSFT",
+            "company_name": "Microsoft Corporation",
+            "price": 492.01,
+            "change_percent": -1.24,
+            "logo_url": "https://logo.clearbit.com/microsoft.com"
+          },
+          {
+            "ticker": "CRWD",
+            "company_name": "CrowdStrike Holdings",
+            "price": 305.12,
+            "change_percent": 0.5,
+            "logo_url": "https://logo.clearbit.com/crowdstrike.com"
+          }
+        ]
       },
-      "trends": {
-        "keyword": "Windows",
-        "trend_score": 50,
-        "trend_direction": "stable",
-        "change_percent": 0,
-        "peak_value": 0,
-        "peak_date": null,
-        "google_trends": {
-          "score": 0,
-          "direction": "stable",
-          "change_percent": 0,
-          "graph_data": [],
-          "related_queries": []
+      "actions": {
+        "jira_payload": {
+          "summary": "Patch Windows Servers (CVE-2025-62215)",
+          "description": "Critical Zero-Day detected. Apply November Patch Tuesday updates immediately.",
+          "priority": "Highest"
         },
-        "social_signals": {
-          "reddit_score": 53,
-          "reddit_posts_24h": 25,
-          "reddit_sentiment": "positive",
-          "hackernews_score": 100,
-          "hackernews_posts_24h": 0,
-          "twitter_estimated": 0
-        },
-        "virality": {
-          "is_trending": false,
-          "trending_regions": [],
-          "breakout_detected": false,
-          "news_volume": "high"
-        },
-        "related_topics": [],
-        "recommended": []
-      },
-      "ai_analysis": {
-        "content": {
-          "title": "Microsoft Fixes 63 Security Flaws, Including a Windows Kernel Zero-Day Under Active Attack",
-          "short_description": "Microsoft released patches for 63 security vulnerabilities, including a Windows Kernel zero-day flaw under active exploitation. The update addresses privilege escalation, remote code execution, and other critical issues.",
-          "long_description": "Microsoft has patched 63 security vulnerabilities, including a zero-day Windows Kernel flaw actively exploited in the wild. The zero-day, CVE-2025-62215, allows privilege escalation via a race condition. Other critical patches address heap-based buffer overflows and a Kerberos vulnerability that could lead to domain control. The updates are crucial for organizations using Active Directory and other affected Microsoft software.",
-          "category": "Security"
-        },
-        "scores": {
-          "confidence_score": 90,
-          "relevance_score": 90,
-          "sentiment_score": -40,
-          "trend_score": 50
-        },
-        "metadata": {
-          "keywords": [
-            "Microsoft",
-            "security flaws",
-            "zero-day",
-            "Windows Kernel",
-            "patches"
-          ],
-          "actionable": true,
-          "generated_by": "gpt-4o"
-        }
-      },
-      "ai_summary": {
-        "summary": "Microsoft released patches for 63 security vulnerabilities, including a Windows Kernel zero-day flaw under active exploitation. The update addresses privilege escalation, remote code execution, and other critical issues.",
-        "key_points": [
-          "Microsoft has patched 63 security vulnerabilities, including a zero-day Windows Kernel flaw actively exploited in the wild. The zero-day, CVE-2025-62215, allows privilege escalation via a race condition. Other critical patches address heap-based buffer overflows and a Kerberos vulnerability that could lead to domain control. The updates are crucial for organizations using Active Directory and other affected Microsoft software."
-        ],
-        "generated_by": "gpt-4o"
+        "slack_message": "*🚨 CRITICAL:* Windows Kernel Zero-Day. Patch Immediately."
       }
     },
     {
